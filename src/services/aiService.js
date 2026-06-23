@@ -1,18 +1,11 @@
-import axios from "axios";
+import API from "./api";
 
-const API_URL =
-  "http://localhost:5000/api/ai";
-
-export const analyzeBuild = async (
-  buildData
-) => {
-  const response = await axios.post(
-  `${API_URL}/analyze`,
-  buildData,
-  {
-    timeout: 120000
-  }
-);
+export const analyzeBuild = async (buildData) => {
+  const response = await API.post(
+    "/ai/analyze",
+    buildData,
+    { timeout: 120000 }
+  );
 
   return response.data;
 };
