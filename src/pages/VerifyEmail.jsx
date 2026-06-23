@@ -1,6 +1,6 @@
 // VerifyEmail.jsx
 import { useEffect, useRef } from "react";
-import API from "../../services/api";
+import API from "../services/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
