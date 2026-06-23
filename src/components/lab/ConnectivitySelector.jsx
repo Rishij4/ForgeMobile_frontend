@@ -1,6 +1,6 @@
 // ConnectivitySelector.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 
 const ConnectivitySelector = ({ config, setConfig }) => {
   const [networks, setNetworks] = useState([]);
@@ -10,7 +10,7 @@ const ConnectivitySelector = ({ config, setConfig }) => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/connectivity");
+        const response = await API.get("/connectivity")
         setNetworks(response.data.networks);
         setWifis(response.data.wifis);
         setBluetooths(response.data.bluetooths);
