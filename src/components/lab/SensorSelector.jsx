@@ -1,6 +1,6 @@
 // SensorSelector.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 
 const SensorSelector = ({ config, setConfig }) => {
   const [sensors, setSensors] = useState([]);
@@ -8,7 +8,7 @@ const SensorSelector = ({ config, setConfig }) => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/sensors");
+        const response = API.get("/sensors")
         setSensors(response.data);
       } catch (error) {
         console.log(error);
