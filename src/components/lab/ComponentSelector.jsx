@@ -1,6 +1,6 @@
 // ComponentSelector.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 
 const ComponentSelector = ({
   config,
@@ -13,9 +13,7 @@ const ComponentSelector = ({
     const fetchComponents = async () => {
       try {
         const response =
-          await axios.get(
-            "http://localhost:5000/api/components"
-          );
+          API.get("/components")
 
         setComponents(response.data);
       } catch (error) {
