@@ -12,7 +12,7 @@ const ComponentSelector = ({
   useEffect(() => {
     const fetchComponents = async () => {
       try {
-        const response =
+        const response = await
           API.get("/components")
 
         setComponents(response.data);
