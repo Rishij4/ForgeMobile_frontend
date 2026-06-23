@@ -1,6 +1,6 @@
 // AudioSelector.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 
 const AudioSelector = ({ config, setConfig }) => {
   const [speakerOptions, setSpeakerOptions] = useState([]);
@@ -11,10 +11,10 @@ const AudioSelector = ({ config, setConfig }) => {
     (async () => {
       try {
         const [speakersRes, dolbyRes, hiResRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/audio/speakers"),
-          axios.get("http://localhost:5000/api/audio/dolby"),
-          axios.get("http://localhost:5000/api/audio/hires")
-        ]);
+  API.get("/audio/speakers"),
+  API.get("/audio/dolby"),
+  API.get("/audio/hires")
+]);
         setSpeakerOptions(speakersRes.data);
         setDolbyOptions(dolbyRes.data);
         setHiResOptions(hiResRes.data);
