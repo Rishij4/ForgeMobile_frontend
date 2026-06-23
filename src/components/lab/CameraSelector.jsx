@@ -1,6 +1,6 @@
 // CameraSelector.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 
 const CameraSelector = ({
   config,
@@ -13,9 +13,7 @@ const CameraSelector = ({
     const fetchCameras = async () => {
       try {
         const response =
-          await axios.get(
-            "http://localhost:5000/api/cameras"
-          );
+          await API.get("/cameras")
 
         setCameraTypes(response.data);
       } catch (error) {
