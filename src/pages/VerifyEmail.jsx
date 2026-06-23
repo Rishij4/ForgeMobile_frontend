@@ -1,6 +1,6 @@
 // VerifyEmail.jsx
 import { useEffect, useRef } from "react";
-import axios from "axios";
+import API from "../../services/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -18,9 +18,7 @@ const VerifyEmail = () => {
 
   const verify = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/auth/verify-email/${token}`
-      );
+      const res = await API.get(`/auth/verify-email/${token}`)
 
       toast.success("Email verified successfully");
 
