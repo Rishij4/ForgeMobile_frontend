@@ -12,7 +12,7 @@ const HapticsSelector = ({
   useEffect(() => {
     const fetchHaptics = async () => {
       try {
-        const response =
+        const response = await
           API.get("/haptics")
 
         setHaptics(response.data);
