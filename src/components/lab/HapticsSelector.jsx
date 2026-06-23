@@ -1,6 +1,6 @@
 // HapticsSelector.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api";
 
 const HapticsSelector = ({
   config,
@@ -13,9 +13,7 @@ const HapticsSelector = ({
     const fetchHaptics = async () => {
       try {
         const response =
-          await axios.get(
-            "http://localhost:5000/api/haptics"
-          );
+          API.get("/haptics")
 
         setHaptics(response.data);
       } catch (error) {
