@@ -8,7 +8,7 @@ const SensorSelector = ({ config, setConfig }) => {
   useEffect(() => {
     (async () => {
       try {
-        const response = API.get("/sensors")
+        const response = await API.get("/sensors")
         setSensors(response.data);
       } catch (error) {
         console.log(error);
