@@ -16,6 +16,7 @@ import Register from "./pages/Auth/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./pages/Admin/Dashboard";
 
 const App = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -68,6 +69,7 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/shared/:id" element={<SharedBuild />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/admin/dashboard" element={<Dashboard />} />
 
         {/* updated route */}
         <Route path="/reset-password" element={<ResetPassword />} />
