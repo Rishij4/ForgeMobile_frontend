@@ -23,7 +23,7 @@ const ResetPassword = () => {
         password,
       });
 
-      toast.success("Password updated successfully ✓");
+      toast.success("Password updated successfully");
 
       // wait so toast is visible
       setTimeout(() => {
