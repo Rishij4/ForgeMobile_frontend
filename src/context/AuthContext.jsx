@@ -1,64 +1,41 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [guestMode, setGuestMode] = useState(false);
+  const [user, setUser] = useState(
+    JSON.parse(sessionStorage.getItem("user")) || null
+  );
 
-  // Load from sessionStorage on app start
-  useEffect(() => {
-    const storedUser = sessionStorage.getItem("user");
-    const storedGuest = sessionStorage.getItem("guestMode");
+  const [guestMode, setGuestMode] = useState(
+    sessionStorage.getItem("guestMode") === "true"
+  );
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
-    if (storedGuest === "true") {
-      setGuestMode(true);
-    }
-  }, []);
-
-  // LOGIN
   const login = (data) => {
     sessionStorage.removeItem("guestMode");
-
     setGuestMode(false);
 
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
-
     setUser(data.user);
   };
 
-  // LOGOUT
   const logout = () => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
-    sessionStorage.removeItem("guestMode");
-
     setUser(null);
-    setGuestMode(false);
-  };
-
-  // ENABLE GUEST MODE
-  const enableGuestMode = () => {
-    sessionStorage.setItem("guestMode", "true");
-    setGuestMode(true);
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        setUser,
-        login,
-        logout,
-        guestMode,
-        setGuestMode: enableGuestMode
-      }}
-    >
+  <AuthContext.Provider
+    value={{
+      user,
+      login,
+      logout,
+      guestMode,
+      setGuestMode
+    }}
+  >
       {children}
     </AuthContext.Provider>
   );
