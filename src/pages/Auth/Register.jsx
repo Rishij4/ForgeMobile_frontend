@@ -22,7 +22,7 @@ const Register = () => {
       });
 
       toast.success(
-        "Registered successfully. Check your email for verification."
+        "Registered successfully. Login to your Account"
       );
 
       setTimeout(() => {
