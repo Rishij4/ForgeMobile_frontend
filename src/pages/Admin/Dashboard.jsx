@@ -239,7 +239,7 @@ const Dashboard = () => {
 
               <h3 className="text-xl font-bold text-white mb-2">Confirm Account Destruction</h3>
               <p className="text-sm text-zinc-400 mb-6 px-2">
-                Are you sure you want to permanently wipe <span className="text-zinc-200 font-semibold">@{userToDelete?.username}</span> from the database? This action is absolute and cannot be undone.
+                Are you sure you want to delete permanently <span className="text-zinc-200 font-semibold">@{userToDelete?.username}</span>
               </p>
 
               {/* Action Choices */}
