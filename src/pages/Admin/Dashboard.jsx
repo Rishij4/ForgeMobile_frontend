@@ -1,9 +1,9 @@
 // Dashboard.jsx
 import { useEffect, useState } from "react";
 import API from "../../services/api";
-import { useNavigate } from "react-router-dom"; // Imported for redirection
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // Added AnimatePresence for modal exit transitions
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -14,7 +14,12 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const navigate = useNavigate(); // Navigation hook
+  // Custom Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboard();
@@ -40,24 +45,38 @@ const Dashboard = () => {
     }
   };
 
-  // Logout Handler
   const handleLogout = () => {
-    sessionStorage.removeItem("adminToken"); // Deletes your security session
+    sessionStorage.removeItem("adminToken");
     toast.info("Logged out successfully");
-    navigate("/admin/login"); // Redirects back to your AdminLogin page
+    navigate("/admin/login");
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Delete user permanently?");
-    if (!confirmDelete) return;
+  // Triggers our beautiful custom modal instead of window.confirm
+  const openDeleteModal = (user) => {
+    setUserToDelete(user);
+    setIsModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsModalOpen(false);
+    setUserToDelete(null);
+  };
+
+  // Actual execution of backend delete
+  const executeDelete = async () => {
+    if (!userToDelete) return;
+    setIsDeleting(true);
 
     try {
-      await API.delete(`/admin-dashboard/users/${id}`);
+      await API.delete(`/admin-dashboard/users/${userToDelete._id}`);
       toast.success("User deleted successfully");
-      setUsers(users.filter((user) => user._id !== id));
+      setUsers(users.filter((u) => u._id !== userToDelete._id));
       setStats((prev) => ({ ...prev, totalUsers: prev.totalUsers - 1 }));
+      closeDeleteModal();
     } catch {
       toast.error("Delete failed");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -88,9 +107,7 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Action Buttons Container */}
           <div className="flex items-center gap-3 w-full md:w-auto">
-            {/* Refresh Button */}
             <button
               onClick={() => fetchDashboard(true)}
               disabled={isRefreshing || isLoading}
@@ -109,7 +126,6 @@ const Dashboard = () => {
               )}
             </button>
 
-            {/* Premium Logout Button */}
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider bg-red-950/20 text-red-400 border border-red-900/30 rounded-xl hover:bg-red-900/20 transition active:scale-95"
@@ -123,58 +139,32 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10"
-        >
-          <motion.div
-            variants={itemVariants}
-            className="bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800/80 hover:border-indigo-500/40 transition-colors duration-300 group"
-          >
+        <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          {/* Card 1 */}
+          <motion.div variants={itemVariants} className="bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800/80 hover:border-indigo-500/40 transition-colors duration-300">
             <div className="flex justify-between items-center">
-              <h2 className="text-sm font-semibold tracking-wider uppercase text-zinc-400">
-                Registered Users
-              </h2>
+              <h2 className="text-sm font-semibold tracking-wider uppercase text-zinc-400">Registered Users</h2>
               <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
               </div>
             </div>
-            <p className="text-4xl font-black mt-4 text-white tracking-tight">
-              {isLoading ? "..." : stats.totalUsers.toLocaleString()}
-            </p>
+            <p className="text-4xl font-black mt-4 text-white tracking-tight">{isLoading ? "..." : stats.totalUsers.toLocaleString()}</p>
           </motion.div>
 
-          <motion.div
-            variants={itemVariants}
-            className="bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800/80 hover:border-violet-500/40 transition-colors duration-300 group"
-          >
+          {/* Card 2 */}
+          <motion.div variants={itemVariants} className="bg-zinc-900/40 backdrop-blur-md p-6 rounded-2xl border border-zinc-800/80 hover:border-violet-500/40 transition-colors duration-300">
             <div className="flex justify-between items-center">
-              <h2 className="text-sm font-semibold tracking-wider uppercase text-zinc-400">
-                Saved Builds
-              </h2>
+              <h2 className="text-sm font-semibold tracking-wider uppercase text-zinc-400">Saved Builds</h2>
               <div className="p-2 rounded-lg bg-violet-500/10 text-violet-400">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
               </div>
             </div>
-            <p className="text-4xl font-black mt-4 text-white tracking-tight">
-              {isLoading ? "..." : stats.totalBuilds.toLocaleString()}
-            </p>
+            <p className="text-4xl font-black mt-4 text-white tracking-tight">{isLoading ? "..." : stats.totalBuilds.toLocaleString()}</p>
           </motion.div>
         </motion.div>
 
         {/* Users Management Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-zinc-900/30 backdrop-blur-md rounded-2xl border border-zinc-800/80 overflow-hidden"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-zinc-900/30 backdrop-blur-md rounded-2xl border border-zinc-800/80 overflow-hidden">
           <div className="p-6 border-b border-zinc-800 bg-zinc-900/20">
             <h2 className="text-lg font-bold text-white">Manage Users</h2>
             <p className="text-xs text-zinc-500 mt-0.5">View user statistics and control system privileges</p>
@@ -193,26 +183,18 @@ const Dashboard = () => {
 
               <tbody className="divide-y divide-zinc-800/60 text-sm">
                 {users.length === 0 && !isLoading ? (
-                  <tr>
-                    <td colSpan="4" className="text-center py-10 text-zinc-500">
-                      No users found in database.
-                    </td>
-                  </tr>
+                  <tr><td colSpan="4" className="text-center py-10 text-zinc-500">No users found.</td></tr>
                 ) : (
                   users.map((user) => (
                     <tr key={user._id} className="hover:bg-zinc-800/30 transition-colors duration-150 group">
-                      <td className="py-4 px-6 font-medium text-zinc-200 group-hover:text-white transition-colors">
-                        {user.username}
-                      </td>
+                      <td className="py-4 px-6 font-medium text-zinc-200 group-hover:text-white transition-colors">{user.username}</td>
                       <td className="py-4 px-6 text-zinc-400">{user.email}</td>
                       <td className="py-4 px-6 text-center font-mono text-zinc-300">
-                        <span className="inline-block bg-zinc-900 px-2.5 py-1 rounded-md border border-zinc-800 text-xs font-semibold">
-                          {user.buildCount || 0}
-                        </span>
+                        <span className="inline-block bg-zinc-900 px-2.5 py-1 rounded-md border border-zinc-800 text-xs font-semibold">{user.buildCount || 0}</span>
                       </td>
                       <td className="py-4 px-6 text-right">
                         <button
-                          onClick={() => handleDelete(user._id)}
+                          onClick={() => openDeleteModal(user)} // Passes full user to show modal safely
                           className="text-xs font-bold text-red-400/80 hover:text-red-400 bg-red-500/10 hover:bg-red-500/20 px-3.5 py-1.5 rounded-lg border border-red-500/20 transition-all active:scale-95"
                         >
                           Delete
@@ -226,6 +208,61 @@ const Dashboard = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* NEW: Premium Custom Confirmation Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Dark blur overlay backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeDeleteModal}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            />
+
+            {/* Modal Card Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ type: "spring", duration: 0.4 }}
+              className="relative w-full max-w-md overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl z-10 text-center"
+            >
+              {/* Alert Danger Warning Icon */}
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-500 mb-4">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+
+              <h3 className="text-xl font-bold text-white mb-2">Confirm Account Destruction</h3>
+              <p className="text-sm text-zinc-400 mb-6 px-2">
+                Are you sure you want to permanently wipe <span className="text-zinc-200 font-semibold">@{userToDelete?.username}</span> from the database? This action is absolute and cannot be undone.
+              </p>
+
+              {/* Action Choices */}
+              <div className="flex items-center gap-3 justify-end">
+                <button
+                  onClick={closeDeleteModal}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-sm font-semibold text-zinc-400 hover:text-white bg-transparent hover:bg-zinc-800 rounded-xl transition duration-150 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={executeDelete}
+                  disabled={isDeleting}
+                  className="flex items-center gap-2 px-5 py-2 text-sm font-bold bg-red-600 hover:bg-red-500 text-white rounded-xl shadow-lg shadow-red-600/10 transition active:scale-95 disabled:opacity-50"
+                >
+                  {isDeleting ? "Wiping account..." : "Yes, Delete User"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
