@@ -26,7 +26,7 @@ const Login = () => {
       toast.success("Login successful");
 
       setTimeout(() => {
-        navigate("/");
+        navigate("/admin/dashboard");
       }, 500);
     } catch (error) {
       toast.error(
