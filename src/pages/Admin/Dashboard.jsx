@@ -13,11 +13,7 @@ const Dashboard = () => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-  const token = sessionStorage.getItem("token");
-
-  if (token) {
-    fetchDashboard();
-  }
+  fetchDashboard();
 }, []);
 
   const fetchDashboard = async () => {
