@@ -4,7 +4,7 @@ import API from "../../services/api";
 import { toast } from "react-toastify";
 
 const Dashboard = () => {
-  console.log("DASHBOARD TOKEN =", sessionStorage.getItem("token"));
+ 
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalBuilds: 0
