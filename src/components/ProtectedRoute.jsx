@@ -2,22 +2,25 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children, allowGuest = false }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const isGuest =
     sessionStorage.getItem("guestMode") === "true";
 
-  // logged in user → allow
+  // wait until auth restores
+  if (loading) {
+    return null; 
+    // or loading spinner
+  }
+
   if (user) {
     return children;
   }
 
-  // guest allowed route → allow
   if (allowGuest && isGuest) {
     return children;
   }
 
-  // otherwise login
   return <Navigate to="/login" />;
 };
 
