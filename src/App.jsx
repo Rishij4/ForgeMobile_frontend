@@ -69,7 +69,14 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/shared/:id" element={<SharedBuild />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route
+  path="/admin/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+/>
 
         {/* updated route */}
         <Route path="/reset-password" element={<ResetPassword />} />
