@@ -9,11 +9,11 @@ API.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem("token");
 
-    console.log("TOKEN FROM STORAGE =", token);
+    
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("HEADER SET =", config.headers.Authorization);
+      
     }
 
     return config;
