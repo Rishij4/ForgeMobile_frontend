@@ -17,6 +17,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Admin/Dashboard";
+import AdminLogin from "./pages/Admin/AdminLogin";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 const App = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -70,11 +72,16 @@ const App = () => {
         <Route path="/shared/:id" element={<SharedBuild />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
+  path="/admin/login"
+  element={<AdminLogin />}
+/>
+
+<Route
   path="/admin/dashboard"
   element={
-    <ProtectedRoute>
+    <AdminProtectedRoute>
       <Dashboard />
-    </ProtectedRoute>
+    </AdminProtectedRoute>
   }
 />
 
