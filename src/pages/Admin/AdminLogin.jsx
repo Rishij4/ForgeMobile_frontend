@@ -18,7 +18,10 @@ const AdminLogin = () => {
         password
       });
 
-      sessionStorage.setItem("adminToken", res.data.token);
+      sessionStorage.setItem(
+        "adminToken",
+        res.data.token
+      );
 
       toast.success("Admin login successful");
 
@@ -30,25 +33,54 @@ const AdminLogin = () => {
   };
 
   return (
-    <div>
-      <h2>Admin Login</h2>
+    <div className="min-h-screen bg-black flex items-center justify-center px-6">
 
-      <form onSubmit={handleAdminLogin}>
-        <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Admin Email"
-        />
+      <div className="w-full max-w-md bg-zinc-900 border border-indigo-500 rounded-2xl p-8 shadow-2xl">
 
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-        />
+        <h1 className="text-3xl font-bold text-white mb-2">
+          Admin Panel
+        </h1>
 
-        <button>Login</button>
-      </form>
+        <p className="text-gray-400 mb-8">
+          Login as administrator
+        </p>
+
+        <form
+          onSubmit={handleAdminLogin}
+          className="space-y-5"
+        >
+
+          <input
+            type="email"
+            placeholder="Admin Email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            className="w-full bg-black border border-zinc-700 rounded-xl p-3 text-white outline-none focus:border-indigo-500"
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="w-full bg-black border border-zinc-700 rounded-xl p-3 text-white outline-none focus:border-indigo-500"
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold transition"
+          >
+            ADMIN LOGIN
+          </button>
+
+        </form>
+
+      </div>
+
     </div>
   );
 };
