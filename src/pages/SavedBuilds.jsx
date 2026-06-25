@@ -35,7 +35,7 @@ const SavedBuilds = () => {
     setDeleting(true);
     try {
       await API.delete(`/builds/${buildToDelete._id}`);
-      setBuilds(prev => prev.filter(b => build._id !== buildToDelete._id));
+      setBuilds(prev => prev.filter(build => build._id !== buildToDelete._id));
       toast.success("Build deleted successfully");
     } catch (error) {
       toast.error("Delete failed");
