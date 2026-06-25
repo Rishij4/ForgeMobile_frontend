@@ -1,15 +1,25 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(
-    JSON.parse(sessionStorage.getItem("user")) || null
-  );
+  const [user, setUser] = useState(null);
+
+  const [loading, setLoading] = useState(true);
 
   const [guestMode, setGuestMode] = useState(
     sessionStorage.getItem("guestMode") === "true"
   );
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    setLoading(false);
+  }, []);
 
   const login = (data) => {
     sessionStorage.removeItem("guestMode");
@@ -17,6 +27,7 @@ export const AuthProvider = ({ children }) => {
 
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
+
     setUser(data.user);
   };
 
@@ -27,15 +38,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-  <AuthContext.Provider
-    value={{
-      user,
-      login,
-      logout,
-      guestMode,
-      setGuestMode
-    }}
-  >
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        loading,
+        guestMode,
+        setGuestMode
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
