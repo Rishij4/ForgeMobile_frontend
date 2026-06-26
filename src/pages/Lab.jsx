@@ -729,7 +729,7 @@ const Lab = () => {
                   </div>
 
                   <div className="bg-gray-950 border border-green-500/20 rounded-2xl p-5 shadow-lg">
-                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">Total Build Price</p>
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">Est.Total Build Price</p>
                     <p className="text-3xl font-bold text-green-400">₹ {totalPrice.toLocaleString()}</p>
                   </div>
 
