@@ -324,7 +324,7 @@ const Lab = () => {
         !navigator.onLine ? "No internet connection" : err.response?.status ? errorsMap[err.response.status] || "AI analysis failed" : err.code === "ECONNABORTED" ? "AI request timed out" : "AI analysis failed"
       );
       setAiError(true);
-    } mdFinal {
+    } finally { // <-- Fixed typo here from mdFinal to finally
       clearInterval(progressInterval);
       toast.dismiss(loadingToast);
       setTimeout(() => {
@@ -334,7 +334,6 @@ const Lab = () => {
     }
   };
 
-  /* BRAND NEW ULTRA-PREMIUM PDF EXPORT ENGINE */
   const exportPDF = async () => {
     if (!canExportPDF || !analysis) {
       toast.error("Run Compatibility Test before exporting");
@@ -344,21 +343,19 @@ const Lab = () => {
     setExportingPDF(true);
     const id = toast.loading("Forging high-fidelity PDF document framework...");
 
-    // Create a sandbox element isolated safely offscreen
     const printSandbox = document.createElement("div");
     printSandbox.style.position = "absolute";
     printSandbox.style.left = "-9999px";
     printSandbox.style.top = "-9999px";
-    printSandbox.style.width = "794px"; // Exact clean pixel mapping layout ratio for Standard A4
+    printSandbox.style.width = "794px";
     printSandbox.style.background = "#090d16";
     printSandbox.style.color = "#ffffff";
     printSandbox.style.fontFamily = "system-ui, -apple-system, sans-serif";
     document.body.appendChild(printSandbox);
 
-    // Dynamic Helper to build precise scoped pages to prevent mid-text element slice bleeding
     const createPdfPage = (contentHtml) => `
-      <div style="width: 794px; height: 1123px; padding: 50px; box-sizing: border-box; background: #090d16; position: relative; display: flex; flex-col; justify-content: space-between; overflow: hidden;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; h: 4px; background: linear-gradient(to right, #6366f1, #a855f7, #06b6d4);"></div>
+      <div style="width: 794px; height: 1123px; padding: 50px; box-sizing: border-box; background: #090d16; position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(to right, #6366f1, #a855f7, #06b6d4);"></div>
         <div style="width: 100%;">
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(99, 102, 241, 0.15); padding-bottom: 15px; margin-bottom: 30px;">
             <div>
@@ -376,7 +373,6 @@ const Lab = () => {
       </div>
     `;
 
-    // PAGE 1: HERO METRICS SUMMARY
     const page1Html = createPdfPage(`
       <div style="margin-top: 20px;">
         <div style="text-transform: uppercase; font-size: 11px; font-weight: 800; color: #818cf8; letter-spacing: 2px; font-family: monospace;">ADVANCED DIAGNOSTIC REPORT</div>
@@ -387,11 +383,11 @@ const Lab = () => {
       </div>
 
       <div style="display: flex; gap: 20px; margin-top: 40px;">
-        <div style="flex: 1; background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; rounded-radius: 16px;">
+        <div style="flex: 1; background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;">
           <div style="font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: bold; letter-spacing: 0.5px;">Total Build Cost</div>
           <div style="font-size: 26px; font-weight: 800; color: #34d399; margin-top: 5px;">₹ ${totalPrice.toLocaleString()}</div>
         </div>
-        <div style="flex: 1; background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; rounded-radius: 16px;">
+        <div style="flex: 1; background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;">
           <div style="font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: bold; letter-spacing: 0.5px;">Estimated Market Value</div>
           <div style="font-size: 26px; font-weight: 800; color: #ffffff; margin-top: 5px;">₹ ${(analysis.marketPrice || totalPrice * 1.2).toLocaleString()}</div>
         </div>
@@ -420,7 +416,6 @@ const Lab = () => {
       </div>
     `);
 
-    // PAGE 2: DETAILED HARDWARE SPECS INLINE GRID
     const formatValue = (val, fall) => val?.name || val?.material || val?.speakers || fall || "Not Selected";
     const sensorsCount = config.sensors?.length || 0;
     const extrasCount = config.components?.length || 0;
@@ -442,7 +437,7 @@ const Lab = () => {
     ].map(r => `
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
         <span style="font-size: 13px; color: #9ca3af; font-weight: 400;">${r.name}</span>
-        <span style="font-size: 13px; color: #ffffff; font-weight: 600; text-align: right; max-w: 400px;">${r.val}</span>
+        <span style="font-size: 13px; color: #ffffff; font-weight: 600; text-align: right; max-width: 400px;">${r.val}</span>
       </div>
     `).join("");
 
@@ -455,10 +450,9 @@ const Lab = () => {
       </div>
     `);
 
-    // PAGE 3: INTEL DIAGNOSTIC SUMMARY
     const renderListItems = (items) => {
       if (!items || items.length === 0) return `<div style="color:#6b7280; font-size:13px;">No metric traces evaluated.</div>`;
-      return items.map(i => `<li style="margin-bottom: 10px; line-height: 1.5; color:#d1d5db; font-size:13px;"><strong style="color:#ffffff;"></strong> ${i}</li>`).join("");
+      return items.map(i => `<li style="margin-bottom: 10px; line-height: 1.5; color:#d1d5db; font-size:13px;">${i}</li>`).join("");
     };
 
     const page3Html = createPdfPage(`
@@ -466,31 +460,29 @@ const Lab = () => {
         <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI DIAGNOSTIC METRIC ANALYSIS</h3>
         
         <div style="margin-bottom: 30px;">
-          <h4 style="color:#34d399; font-size:14px; font-weight:bold; margin-bottom:10px; display:flex; align-items:center; gap:6px;">▲ SYSTEM STRENGTHS</h4>
+          <h4 style="color:#34d399; font-size:14px; font-weight:bold; margin-bottom:10px;">▲ SYSTEM STRENGTHS</h4>
           <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.strengths)}</ul>
         </div>
 
         <div style="margin-bottom: 30px;">
-          <h4 style="color:#f87171; font-size:14px; font-weight:bold; margin-bottom:10px; display:flex; align-items:center; gap:6px;">▼ ARCHITECTURAL WEAKNESSES</h4>
+          <h4 style="color:#f87171; font-size:14px; font-weight:bold; margin-bottom:10px;">▼ ARCHITECTURAL WEAKNESSES</h4>
           <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.weaknesses)}</ul>
         </div>
 
         <div style="margin-bottom: 30px;">
-          <h4 style="color:#fbbf24; font-size:14px; font-weight:bold; margin-bottom:10px; display:flex; align-items:center; gap:6px;">❖ OPTIMIZATION SUGGESTIONS</h4>
+          <h4 style="color:#fbbf24; font-size:14px; font-weight:bold; margin-bottom:10px;">❖ OPTIMIZATION SUGGESTIONS</h4>
           <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.upgrades || analysis.suggestions)}</ul>
         </div>
 
-        <div style="border-t: 1px solid rgba(255,255,255,0.05); padding-top: 25px;">
+        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 25px;">
           <h4 style="color:#818cf8; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:10px; font-family:monospace; text-transform:uppercase;">EXECUTIVE EVALUATOR SUMMARY</h4>
           <p style="color:#9ca3af; font-size:13px; line-height:1.6; margin:0; text-align:justify;">${analysis.summary || "Blueprint verification profile compiled without execution errors."}</p>
         </div>
       </div>
     `);
 
-    // Compile layout arrays onto our virtual offscreen canvas sandbox
     printSandbox.innerHTML = page1Html + page2Html + page3Html;
 
-    // Convert off-screen page items to vector graphics canvas via html2canvas loops
     const pages = printSandbox.children;
     const pdf = new jsPDF("p", "mm", "a4");
 
@@ -498,7 +490,7 @@ const Lab = () => {
       if (i > 0) pdf.addPage();
       
       const pageCanvas = await html2canvas(pages[i], {
-        scale: 2.5, // Crisp retina texture density multiplier
+        scale: 2.5,
         useCORS: true,
         allowTaint: false,
         backgroundColor: "#090d16",
@@ -509,10 +501,8 @@ const Lab = () => {
       pdf.addImage(cleanImage, "PNG", 0, 0, 210, 297);
     }
 
-    // Save final premium PDF blueprint layout cleanly without page intersection cuts
     pdf.save(`${buildName.trim().replace(/\s+/g, "-") || "ForgeMobile"}-Premium-Report.pdf`);
     
-    // Wipe sandbox memory tracking footprints completely
     document.body.removeChild(printSandbox);
     toast.dismiss(id);
     toast.success("Premium Report Exported Successfully");
