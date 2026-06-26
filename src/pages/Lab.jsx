@@ -402,7 +402,7 @@ const Lab = () => {
       <div style="margin-top: 45px;">
         <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; font-family: monospace;">CORE PERFORMANCE RATINGS</h3>
         
-        {/* Updated grid rules from 2-columns to 3-columns layout mapping to seamlessly accommodate 5 metrics */}
+        
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
           <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Overall Integrity</span>
@@ -421,7 +421,7 @@ const Lab = () => {
             <span style="font-size: 18px; font-weight: 800; color: #fb923c;">${analysis.thermalScore || 88}%</span>
           </div>
           
-          {/* Brand New Build Quality Metric Card Injection Layer */}
+          
           <div style="background: rgba(168, 85, 247, 0.04); border: 1px solid rgba(168, 85, 247, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; grid-column: span 2;">
             <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Build Quality Integrity</span>
             <span style="font-size: 18px; font-weight: 800; color: #c084fc;">${analysis.buildQuality || 90}%</span>
