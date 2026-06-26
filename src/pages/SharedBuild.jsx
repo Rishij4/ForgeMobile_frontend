@@ -16,7 +16,10 @@ const SharedBuild = () => {
 
   const formatComponent = (key, value) => {
     if (!value) return "Not Selected";
-    const sliceMap = (arr) => arr.slice(0, 4).map(i => i.name).join(", ") + "...";
+    
+    // Renders all items in the array cleanly separated by commas
+    const fullMap = (arr) => arr.map(i => i.name).join(", ");
+    
     switch (key) {
       case "processor": case "display": return value.name;
       case "ram": return `${value.size}GB ${value.type}`;
@@ -28,7 +31,7 @@ const SharedBuild = () => {
       case "thermal": return value.name || "Not Selected";
       case "phoneBuild": return value.material || "Not Selected";
       case "haptics": return value.name;
-      case "sensors": case "components": return sliceMap(value);
+      case "sensors": case "components": return fullMap(value);
       default: return typeof value === "object" ? value.name || "Custom Component" : value;
     }
   };
@@ -91,8 +94,12 @@ const SharedBuild = () => {
           <div className="divide-y divide-gray-900 text-xs sm:text-sm font-medium">
             {Object.entries(build.selectedComponents || {}).map(([key, value]) => (
               <div key={key} className="flex flex-col xs:flex-row justify-between items-start xs:items-center py-3 gap-1 xs:gap-4 hover:bg-white/[0.01] transition-colors">
-                <span className="text-gray-400 font-normal text-[11px] xs:text-sm uppercase xs:normal-case tracking-wider xs:tracking-normal">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                <span className="text-left xs:text-right w-full xs:max-w-xs sm:max-w-lg text-white font-semibold block xs:inline truncate">
+                <span className="text-gray-400 font-normal text-[11px] xs:text-sm uppercase xs:normal-case tracking-wider xs:tracking-normal shrink-0">
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </span>
+                
+                {/* Changed layout rules below to support full string multi-line wrap styling */}
+                <span className="text-left xs:text-right w-full xs:max-w-xs sm:max-w-lg text-white font-semibold block xs:inline break-words">
                   {formatComponent(key, value)}
                 </span>
               </div>
