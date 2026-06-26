@@ -381,49 +381,49 @@ const Lab = () => {
     // --- PAGE 1 GENERATION ---
     const page1Content = `
       <div style="margin-top: 20px;">
-        <div style="text-transform: uppercase; font-size: 11px; font-weight: 800; color: #818cf8; letter-spacing: 2px; font-family: monospace;">ADVANCED DIAGNOSTIC REPORT</div>
-        <h1 style="font-size: 38px; font-weight: 900; color: #ffffff; margin: 10px 0 5px 0; tracking: -0.5px;">Build: ${buildName || "Rishi"}</h1>
+        <div style="text-transform: uppercase; font-size: 11px; font-weight: 800; color: #818cf8; letter-spacing: 2px; font-family: monospace;">DIAGNOSTIC REPORT</div>
+        <h1 style="font-size: 38px; font-weight: 900; color: #ffffff; margin: 10px 0 5px 0; tracking: -0.5px;">BuildName: ${buildName || "Unknown"}</h1>
         <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: ${analysis.compatible ? "#34d399" : "#fbbf24"};">
-          <span style="font-size: 10px;">●</span> ${analysis.compatible ? "Compatible Verification Passed" : "System Warnings Detected"}
+          <span style="font-size: 10px;">Compatible:</span> ${analysis.compatible ? "✅ Yes" : "❌ No"}
         </div>
       </div>
 
       <div style="display: flex; gap: 20px; margin-top: 40px;">
         <div style="flex: 1; background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;">
-          <div style="font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: bold; letter-spacing: 0.5px;">Total Build Cost</div>
+          <div style="font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: bold; letter-spacing: 0.5px;">Estimated Price</div>
           <div style="font-size: 26px; font-weight: 800; color: #34d399; margin-top: 5px;">₹ ${totalPrice.toLocaleString()}</div>
         </div>
         <div style="flex: 1; background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;">
-          <div style="font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: bold; letter-spacing: 0.5px;">Estimated Market Value</div>
+          <div style="font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: bold; letter-spacing: 0.5px;">Market Price</div>
           <div style="font-size: 26px; font-weight: 800; color: #ffffff; margin-top: 5px;">₹ ${(analysis.marketPrice || totalPrice * 1.2).toLocaleString()}</div>
         </div>
       </div>
 
       <div style="margin-top: 45px;">
-        <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; font-family: monospace;">CORE PERFORMANCE RATINGS</h3>
+        <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; font-family: monospace;">Compatibility Result</h3>
         
         
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
           <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Overall Integrity</span>
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Compatibility Score</span>
             <span style="font-size: 18px; font-weight: 800; color: #ffffff;">${analysis.overallScore || 95}%</span>
           </div>
           <div style="background: rgba(6, 182, 212, 0.04); border: 1px solid rgba(6, 182, 212, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Processor Performance</span>
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Performance Score</span>
             <span style="font-size: 18px; font-weight: 800; color: #22d3ee;">${analysis.performanceScore || 99}%</span>
           </div>
           <div style="background: rgba(52, 211, 153, 0.04); border: 1px solid rgba(52, 211, 153, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Battery Optimization</span>
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Battery Efficiency</span>
             <span style="font-size: 18px; font-weight: 800; color: #34d399;">${analysis.batteryEfficiency || 99}%</span>
           </div>
           <div style="background: rgba(249, 115, 22, 0.04); border: 1px solid rgba(249, 115, 22, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Thermal Control</span>
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Thermal Score</span>
             <span style="font-size: 18px; font-weight: 800; color: #fb923c;">${analysis.thermalScore || 88}%</span>
           </div>
           
           
-          <div style="background: rgba(168, 85, 247, 0.04); border: 1px solid rgba(168, 85, 247, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; grid-column: span 2;">
-            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Build Quality Integrity</span>
+          <div style="background: rgba(168, 85, 247, 0.04); border: 1px solid rgba(168, 85, 247, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Build Quality</span>
             <span style="font-size: 18px; font-weight: 800; color: #c084fc;">${analysis.buildQuality || 90}%</span>
           </div>
         </div>
@@ -447,18 +447,18 @@ const Lab = () => {
 
     const specsRows = [
       { name: "Processor", val: formatValue(config.processor) },
-      { name: "RAM Architecture", val: config.ram ? `${config.ram.size}GB ${config.ram.type}` : "Not Selected" },
-      { name: "Storage Module", val: config.storage ? `${config.storage.capacity}GB ${config.storage.type}` : "Not Selected" },
-      { name: "Battery Cell Tank", val: config.battery ? `${config.battery.capacity}mAh (${config.battery.chargingSpeed}W)` : "Not Selected" },
-      { name: "Display Panel", val: config.display ? `${config.display.panelType} ${config.display.refreshRate}Hz` : "Not Selected" },
-      { name: "Camera Suite", val: cameraSpecs }, 
-      { name: "Thermal Subsystem", val: formatValue(config.thermal) },
-      { name: "Chassis Material", val: formatValue(config.phoneBuild) },
-      { name: "Haptic Actuator", val: formatValue(config.haptics) },
-      { name: "Connectivity Suite", val: `${config.connectivity?.network?.type || "5G"} | ${config.connectivity?.wifi?.type || "WiFi"} | ${config.connectivity?.bluetooth?.type || "BT"}` },
+      { name: "Memory System", val: config.ram ? `${config.ram.size}GB ${config.ram.type}` : "Not Selected" },
+      { name: "Storage System", val: config.storage ? `${config.storage.capacity}GB ${config.storage.type}` : "Not Selected" },
+      { name: "Battery System", val: config.battery ? `${config.battery.capacity}mAh (${config.battery.chargingSpeed}W)` : "Not Selected" },
+      { name: "Display System", val: config.display ? `${config.display.panelType} ${config.display.refreshRate}Hz` : "Not Selected" },
+      { name: "Camera System", val: cameraSpecs }, 
+      { name: "Thermal System", val: formatValue(config.thermal) },
+      { name: "Device Build", val: formatValue(config.phoneBuild) },
+      { name: "Haptic Engine", val: formatValue(config.haptics) },
+      { name: "Connectivity", val: `${config.connectivity?.network?.type || "5G"} | ${config.connectivity?.wifi?.type || "WiFi"} | ${config.connectivity?.bluetooth?.type || "BT"}` },
       { name: "Audio System", val: formatValue(config.audio) },
-      { name: "Sensors Matrix", val: sensorsSpecs }, 
-      { name: "Expansion Nodes", val: expansionSpecs } 
+      { name: "Sensors Array", val: sensorsSpecs }, 
+      { name: "Additional Components", val: expansionSpecs } 
     ].map(r => `
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.03); gap: 20px;">
         <span style="font-size: 13px; color: #9ca3af; font-weight: 400; flex-shrink: 0;">${r.name}</span>
@@ -468,7 +468,7 @@ const Lab = () => {
 
     const page2Content = `
       <div>
-        <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">HARDWARE SPECIFICATION MANIFEST</h3>
+        <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">HARDWARE SPECIFICATIONS</h3>
         <div style="background: rgba(17, 24, 39, 0.4); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 10px 25px;">
           ${specsRows}
         </div>
@@ -484,21 +484,21 @@ const Lab = () => {
     let sandboxPagesHTML = buildWrapperHTML(page1Content) + buildWrapperHTML(page2Content);
 
     const aiDataSegment1 = `
-      <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI DIAGNOSTIC METRIC ANALYSIS</h3>
+      <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI RECOMMENDATION</h3>
       
       <div style="margin-bottom: 25px;">
-        <h4 style="color:#34d399; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▲ SYSTEM STRENGTHS</h4>
+        <h4 style="color:#34d399; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▲ PROS</h4>
         <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.strengths)}</ul>
       </div>
 
       <div style="margin-bottom: 25px;">
-        <h4 style="color:#f87171; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▼ ARCHITECTURAL WEAKNESSES</h4>
+        <h4 style="color:#f87171; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▼ CONS</h4>
         <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.weaknesses)}</ul>
       </div>
     `;
 
     const aiDataSegment2 = `
-      <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">SYSTEM PERFORMANCE EVALUATION CONTINUED</h3>
+      <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI RECOMMENDATION CONTINUED</h3>
 
       <div style="margin-bottom: 30px;">
         <h4 style="color:#fbbf24; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">❖ OPTIMIZATION SUGGESTIONS</h4>
@@ -506,7 +506,7 @@ const Lab = () => {
       </div>
 
       <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px;">
-        <h4 style="color:#818cf8; font-size:11px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; font-family:monospace; text-transform:uppercase;">EXECUTIVE EVALUATOR SUMMARY</h4>
+        <h4 style="color:#818cf8; font-size:11px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; font-family:monospace; text-transform:uppercase;">EXECUTIVE BUILD SUMMARY</h4>
         <p style="color:#9ca3af; font-size:13px; line-height:1.55; margin:0; text-align:justify;">${analysis.summary || "Blueprint verification profile compiled without execution errors."}</p>
       </div>
     `;
