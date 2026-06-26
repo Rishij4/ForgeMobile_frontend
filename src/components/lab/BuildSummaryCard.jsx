@@ -67,14 +67,14 @@ const BuildSummaryCard = ({
       </motion.div>
 
       <motion.div variants={itemVariants} className="mt-8 bg-green-900/20 border border-green-500 rounded-2xl p-6 shadow-inner">
-        <h3 className="text-xl sm:text-2xl font-bold text-green-400 tracking-tight">Total Build Price: ₹{totalPrice?.toLocaleString()}</h3>
+        <h3 className="text-xl sm:text-2xl font-bold text-green-400 tracking-tight">Estimated Price: ₹{totalPrice?.toLocaleString()}</h3>
       </motion.div>
       <motion.div
         variants={itemVariants}
         className="mt-4 bg-blue-900/20 border border-blue-500 rounded-2xl p-6 shadow-inner"
       >
         <h3 className="text-xl sm:text-2xl font-bold text-blue-400 tracking-tight">
-          Market Price: ₹{marketPrice ? marketPrice.toLocaleString() : "Not Available"}
+          Market Price: ₹{marketPrice ? marketPrice.toLocaleString() : "Run Test For Market Price"}
         </h3>
       </motion.div>
     </motion.div>
