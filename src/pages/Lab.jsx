@@ -59,16 +59,14 @@ const Lab = () => {
   const [pendingNavigation, setPendingNavigation] = useState(null);
   const [showLeaveLabModal, setShowLeaveLabModal] = useState(false);
 
-  const summaryRef = useRef(null);
-  const compatibilityRef = useRef(null);
-  const graphsRef = useRef(null);
-  const aiRef = useRef(null);
+  const reportRef = useRef(null);
   const isInitialEditLoad = useRef(false);
   const presetLoaded = useRef(false);
   const [scanStage, setScanStage] = useState("");
   const [showPreview, setShowPreview] = useState(false);
   const [showPreviewNotice, setShowPreviewNotice] = useState(false);
   const [previewDevice, setPreviewDevice] = useState("desktop");
+  const [exportingPDF, setExportingPDF] = useState(false);
   
 
   const [config, setConfig] = useState({
@@ -366,24 +364,55 @@ const progressInterval = setInterval(() => {
 }
 };
 
-  const addSectionToPDF = async (pdf, ref, firstPage = false) => {
-    if (!ref.current) return;
-    const canvas = await html2canvas(ref.current, { scale: 2, useCORS: true });
-    const imgData = canvas.toDataURL("image/png");
-    const pW = pdf.internal.pageSize.getWidth(), pH = pdf.internal.pageSize.getHeight();
-    if (!firstPage) pdf.addPage();
-    pdf.addImage(imgData, "PNG", 0, 10, pW, Math.min((canvas.height * pW) / canvas.width, pH - 20));
-  };
+  
 
   const exportPDF = async () => {
-    if (!canExportPDF) return toast.error("Run Compatibility Test before exporting");
-    const pdf = new jsPDF("p", "mm", "a4");
-    await addSectionToPDF(pdf, summaryRef, true);
-    await addSectionToPDF(pdf, compatibilityRef);
-    await addSectionToPDF(pdf, graphsRef);
-    await addSectionToPDF(pdf, aiRef);
-    pdf.save(`${buildName || "Build"}-${new Date().toISOString().split("T")[0]}.pdf`);
-  };
+  if (!canExportPDF) {
+    toast.error("Run Compatibility Test before exporting");
+    return;
+  }
+
+  setExportingPDF(true);
+
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
+  const input = reportRef.current;
+
+  const canvas = await html2canvas(input, {
+    scale: 3,
+    useCORS: true,
+    allowTaint: true,
+    foreignObjectRendering: true,
+    backgroundColor: "#111827",
+    logging: false,
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const pdfWidth = 210;
+  const pageHeight = 297;
+  const imgWidth = pdfWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 0;
+
+  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  pdf.save(`${buildName || "ForgeMobile"}.pdf`);
+
+  setExportingPDF(false);
+};
 
   const updateConfig = (updater) => {
     setBuildSaved(false);
@@ -663,6 +692,7 @@ const progressInterval = setInterval(() => {
 
           {/* DIAGNOSTIC OUTPUT SECTIONS */}
           <div
+            ref={reportRef}
   className={`
     mt-8 space-y-8 transition-all duration-500
     ${showPreview
@@ -672,7 +702,7 @@ const progressInterval = setInterval(() => {
 >
             <AnimatePresence mode="wait">
               {(hasSelectedComponents || aiLoading || analysis) && (
-                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} ref={summaryRef} className="space-y-6">
+                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}  className="space-y-6">
                   {analysis && (
                     <div className="bg-gray-900 border border-indigo-500/20 rounded-2xl shadow-xl p-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                       <div>
@@ -731,16 +761,16 @@ const progressInterval = setInterval(() => {
               </div>
             )}
 
-            {!aiLoading && (analysis || result) && <div ref={compatibilityRef} className="animate-fadeIn"><CompatibilityCard result={analysis || result} /></div>}
+            {!aiLoading && (analysis || result) && <div  className="animate-fadeIn"><CompatibilityCard result={analysis || result} /></div>}
 
             {analysis && (
               <>
-                <div ref={graphsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   <PerformanceChart score={analysis.performanceScore} />
                   <BatteryChart score={analysis.batteryEfficiency} />
                   <ThermalChart score={analysis.thermalScore} />
                 </div>
-                <div ref={aiRef} className="animate-fadeIn"><AIRecommendationCard analysis={analysis} /></div>
+                <div  className="animate-fadeIn"><AIRecommendationCard analysis={analysis} /></div>
               </>
             )}
           </div>
