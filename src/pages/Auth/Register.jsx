@@ -8,6 +8,7 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
   const navigate = useNavigate();
 
@@ -71,6 +72,7 @@ const Register = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full bg-black border border-gray-800 focus:border-indigo-500 rounded-xl p-3.5 text-sm text-white outline-none transition-all font-medium placeholder-gray-600"
+              required
             />
           </div>
 
@@ -81,17 +83,27 @@ const Register = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-black border border-gray-800 focus:border-indigo-500 rounded-xl p-3.5 text-sm text-white outline-none transition-all font-medium placeholder-gray-600"
+              required
             />
           </div>
 
-          <div>
+          {/* Password Input Group Wrapper */}
+          <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black border border-gray-800 focus:border-indigo-500 rounded-xl p-3.5 text-sm text-white outline-none transition-all font-medium placeholder-gray-600"
+              className="w-full bg-black border border-gray-800 focus:border-indigo-500 rounded-xl p-3.5 pr-11 text-sm text-white outline-none transition-all font-medium placeholder-gray-600"
+              required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors focus:outline-none text-xs font-semibold uppercase tracking-wider select-none px-1 py-0.5"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
           </div>
 
           <button
