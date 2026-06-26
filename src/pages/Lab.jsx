@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import autoTable from "jspdf-autotable";
 import toast, { Toaster } from "react-hot-toast";
 
 import ProcessorSelector from "../components/lab/ProcessorSelector";
@@ -59,14 +59,13 @@ const Lab = () => {
   const [pendingNavigation, setPendingNavigation] = useState(null);
   const [showLeaveLabModal, setShowLeaveLabModal] = useState(false);
 
-  const reportRef = useRef(null);
+  
   const isInitialEditLoad = useRef(false);
   const presetLoaded = useRef(false);
   const [scanStage, setScanStage] = useState("");
   const [showPreview, setShowPreview] = useState(false);
   const [showPreviewNotice, setShowPreviewNotice] = useState(false);
   const [previewDevice, setPreviewDevice] = useState("desktop");
-  const [exportingPDF, setExportingPDF] = useState(false);
   
 
   const [config, setConfig] = useState({
@@ -366,52 +365,224 @@ const progressInterval = setInterval(() => {
 
   
 
-  const exportPDF = async () => {
-  if (!canExportPDF) {
-    toast.error("Run Compatibility Test before exporting");
+  const exportPDF = () => {
+  if (!analysis) {
+    toast.error("Run Compatibility Test first");
     return;
   }
 
-  setExportingPDF(true);
+  const pdf = new jsPDF();
 
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  // ================= PAGE 1 =================
+  pdf.setFontSize(24);
+  pdf.setFillColor(15, 23, 42);   // dark header
+  pdf.rect(0, 0, 210, 40, "F");
+  
+  pdf.setTextColor(255,255,255);
+  pdf.setFontSize(26);
+  pdf.text("FORGEMOBILE", 20, 18);
+  
+  pdf.setFontSize(11);
+  pdf.text("AI Powered Smartphone Compatibility Engine", 20, 26);
+  
+  
 
-  const input = reportRef.current;
+  pdf.setFontSize(14);
+  pdf.text("Advanced Diagnostic Report", 20, 34);
+  pdf.setTextColor(0,0,0); // reset
 
-  const canvas = await html2canvas(input, {
-    scale: 3,
-    useCORS: true,
-    allowTaint: true,
-    foreignObjectRendering: true,
-    backgroundColor: "#111827",
-    logging: false,
+  pdf.line(20, 35, 190, 35);
+
+  pdf.setFontSize(12);
+  pdf.text(`Build Name: ${buildName || "Untitled Build"}`, 20, 50);
+  pdf.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 58);
+  pdf.text(`Build Price: Rs.${totalPrice}`, 20, 66);
+
+  if (analysis.marketPrice) {
+    pdf.text(`Market Price: Rs.${analysis.marketPrice}`, 20, 74);
+  }
+  pdf.setTextColor(34,197,94);
+
+  pdf.text(
+    `Compatibility: ${
+      analysis.compatible ? "Compatible" : "Not Compatible"
+    }`,
+    20,
+    82
+  );
+  pdf.setTextColor(0,0,0);
+
+  autoTable(pdf, {
+    startY: 95,
+    head: [["Metric", "Score"]],
+    body: [
+      ["Overall Score", `${analysis.overallScore}%`],
+      ["Performance", `${analysis.performanceScore}%`],
+      ["Battery", `${analysis.batteryEfficiency}%`],
+      ["Thermal", `${analysis.thermalScore}%`],
+    ],
+  });
+  const drawMetricBar = (label, score, y) => {
+  pdf.setFontSize(11);
+
+  pdf.text(label, 20, y);
+
+  // background
+  pdf.setDrawColor(220,220,220);
+  pdf.rect(65, y - 4, 100, 6);
+
+  // indigo fill
+  pdf.setFillColor(79,70,229);
+  pdf.rect(65, y - 4, score, 6, "F");
+
+  pdf.text(`${score}%`, 170, y);
+};
+
+  let y = pdf.lastAutoTable.finalY + 20;
+
+drawMetricBar("Performance", analysis.performanceScore, y);
+drawMetricBar("Battery", analysis.batteryEfficiency, y + 15);
+drawMetricBar("Thermal", analysis.thermalScore, y + 30);
+  // ================= PAGE 2 =================
+  pdf.addPage();
+
+  pdf.setFontSize(20);
+  pdf.text("Hardware Configuration", 20, 20);
+
+  autoTable(pdf, {
+    startY: 30,
+    head: [["Component", "Selection"]],
+    body: [
+      ["Processor", config.processor?.name || "-"],
+      ["RAM", `${config.ram?.size || "-"}GB ${config.ram?.type || ""}`],
+      [
+        "Storage",
+        `${config.storage?.capacity || "-"}GB ${
+          config.storage?.type || ""
+        }`,
+      ],
+      [
+        "Battery",
+        `${config.battery?.capacity || "-"}mAh`,
+      ],
+      [
+        "Display",
+        `${config.display?.panelType || "-"}`,
+      ],
+      [
+        "Camera",
+        `${config.camera?.count || "-"} Cameras`,
+      ],
+      [
+        "Thermal",
+        config.thermal?.name || "-",
+      ],
+      [
+        "Build Material",
+        config.phoneBuild?.material || "-",
+      ],
+      [
+        "Haptics",
+        config.haptics?.name || "-",
+      ],
+      ["Network", config.connectivity?.network?.type || "-"],
+      ["WiFi", config.connectivity?.wifi?.type || "-"],
+      ["Bluetooth", config.connectivity?.bluetooth?.type || "-"],
+      ["Audio", config.audio?.speakers || "-"],
+      ["Sensors", config.sensors?.length || 0],
+      ["Extra Components", config.components?.length || 0],
+    ],
   });
 
-  const imgData = canvas.toDataURL("image/png");
+  // ================= PAGE 3 =================
+  pdf.addPage();
 
-  const pdf = new jsPDF("p", "mm", "a4");
+  pdf.setFontSize(20);
+  pdf.text("AI Diagnostic Analysis", 20, 20);
 
-  const pdfWidth = 210;
-  const pageHeight = 297;
-  const imgWidth = pdfWidth;
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  let aiY = 35;
 
-  let heightLeft = imgHeight;
-  let position = 0;
+  pdf.setFontSize(14);
+  pdf.text("Strengths", 20, aiY);
 
-  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;
+  pdf.setFontSize(11);
 
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-  }
+  analysis.strengths?.forEach((item, i) => {
+    pdf.text(`• ${item}`, 25, aiY + 10 + i * 8);
+  });
 
-  pdf.save(`${buildName || "ForgeMobile"}.pdf`);
+  aiY += (analysis.strengths?.length || 1) * 8 + 20
 
-  setExportingPDF(false);
+  pdf.setFontSize(14);
+  pdf.text("Weaknesses", 20, aiY);
+
+  pdf.setFontSize(11);
+
+  analysis.weaknesses?.forEach((item, i) => {
+    pdf.text(`• ${item}`, 25, aiY + 10 + i * 8);
+  });
+
+  aiY += (analysis.weaknesses?.length || 1) * 8 + 20;
+
+  pdf.setFontSize(14);
+  pdf.text("Upgrade Suggestions", 20, aiY);
+
+  pdf.setFontSize(11);
+
+  (analysis.upgrades || analysis.upgradeSuggestions || []).forEach((item, i) => {
+    pdf.text(`• ${item}`, 25, aiY + 10 + i * 8);
+  });
+
+  const upgradesList =
+  analysis.upgrades || analysis.upgradeSuggestions || [];
+
+upgradesList.forEach((item, i) => {
+  pdf.text(`• ${item}`, 25, aiY + 10 + i * 8);
+});
+
+aiY += (upgradesList.length || 1) * 8 + 20;
+
+  pdf.setFontSize(14);
+  pdf.text("AI Summary", 20, aiY);
+
+  pdf.setFontSize(10);
+
+  const summary = pdf.splitTextToSize(
+    analysis.summary || "No summary available",
+    170
+  );
+
+  pdf.text(summary, 20, aiY + 10);
+
+  // ================= PAGE 4 =================
+  pdf.addPage();
+
+pdf.setFillColor(15,23,42);
+pdf.rect(0,0,210,297,"F");
+
+pdf.setTextColor(255,255,255);
+
+pdf.setFontSize(30);
+pdf.text("FORGEMOBILE", 55, 50);
+
+pdf.setFontSize(18);
+pdf.text("CERTIFIED DEVICE REPORT", 42, 80);
+
+pdf.setFontSize(16);
+pdf.text(
+  `Integrity Score: ${analysis.overallScore}/100`,
+  55,
+  120
+);
+
+pdf.text("AI Validation Passed ✓", 58, 145);
+
+pdf.line(60, 220, 150, 220);
+
+pdf.setFontSize(12);
+pdf.text("ForgeMobile AI Engine Signature", 55, 235);
+
+  pdf.save(`${buildName || "ForgeMobile"}-Premium-Report.pdf`);
 };
 
   const updateConfig = (updater) => {
@@ -692,7 +863,7 @@ const progressInterval = setInterval(() => {
 
           {/* DIAGNOSTIC OUTPUT SECTIONS */}
           <div
-            ref={reportRef}
+            
   className={`
     mt-8 space-y-8 transition-all duration-500
     ${showPreview
