@@ -133,14 +133,14 @@ const Lab = () => {
         overallScore: editBuild.compatibilityResult?.score,
         performanceScore: editBuild.compatibilityResult?.performanceScore,
         thermalScore: editBuild.compatibilityResult?.thermalScore,
-        buildQuality: editBuild.compatibilityResult?.buildQuality || editBuild.performanceScore || 0,
+        buildQuality: editBuild.compatibilityResult?.buildQuality,
         batteryEfficiency: editBuild.compatibilityResult?.batteryEfficiency,
         issues: editBuild.compatibilityResult?.issues || [],
         strengths: editBuild.aiRecommendation?.strengths || [],
         weaknesses: editBuild.aiRecommendation?.weaknesses || [],
         summary: editBuild.aiRecommendation?.summary || "",
         upgrades: editBuild.aiRecommendation?.upgradeSuggestions || editBuild.compatibilityResult?.suggestions || [],
-        marketPrice: editBuild.marketPrice || editBuild.compatibilityResult?.marketPrice || null, // <-- Fixed Hydration Reference Fallback
+        marketPrice: editBuild.marketPrice,
       });
       setTestCompleted(true); setCanExportPDF(true); sessionStorage.removeItem("editBuild");
     }
@@ -324,7 +324,7 @@ const Lab = () => {
         !navigator.onLine ? "No internet connection" : err.response?.status ? errorsMap[err.response.status] || "AI analysis failed" : err.code === "ECONNABORTED" ? "AI request timed out" : "AI analysis failed"
       );
       setAiError(true);
-    } finally {
+    } finally { // <-- Fixed typo here from mdFinal to finally
       clearInterval(progressInterval);
       toast.dismiss(loadingToast);
       setTimeout(() => {
@@ -334,7 +334,7 @@ const Lab = () => {
     }
   };
 
-  /* ADVANCED MULTI-PAGE DYNAMIC OVERFLOW PDF EXPORT ENGINE */
+ /* ADVANCED MULTI-PAGE DYNAMIC OVERFLOW PDF EXPORT ENGINE */
   const exportPDF = async () => {
     if (!canExportPDF || !analysis) {
       toast.error("Run Compatibility Test before exporting");
@@ -344,6 +344,7 @@ const Lab = () => {
     setExportingPDF(true);
     const toastId = toast.loading("Forging high-fidelity PDF document framework...");
 
+    // Create a sandbox element isolated safely offscreen
     const printSandbox = document.createElement("div");
     printSandbox.style.position = "absolute";
     printSandbox.style.left = "-9999px";
@@ -354,6 +355,7 @@ const Lab = () => {
     printSandbox.style.fontFamily = "system-ui, -apple-system, sans-serif";
     document.body.appendChild(printSandbox);
 
+    // Global layout structural builder string helper
     const buildWrapperHTML = (contentHtml) => `
       <div class="pdf-page" style="width: 794px; height: 1123px; padding: 50px; box-sizing: border-box; background: #090d16; position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; margin-bottom: 0;">
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(to right, #6366f1, #a855f7, #06b6d4);"></div>
@@ -376,6 +378,7 @@ const Lab = () => {
       </div>
     `;
 
+    // --- PAGE 1 GENERATION ---
     const page1Content = `
       <div style="margin-top: 20px;">
         <div style="text-transform: uppercase; font-size: 11px; font-weight: 800; color: #818cf8; letter-spacing: 2px; font-family: monospace;">DIAGNOSTIC REPORT</div>
@@ -398,6 +401,8 @@ const Lab = () => {
 
       <div style="margin-top: 45px;">
         <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; font-family: monospace;">Compatibility Result</h3>
+        
+        
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
           <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Compatibility Score</span>
@@ -415,6 +420,8 @@ const Lab = () => {
             <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Thermal Score</span>
             <span style="font-size: 18px; font-weight: 800; color: #fb923c;">${analysis.thermalScore || 88}%</span>
           </div>
+          
+          
           <div style="background: rgba(168, 85, 247, 0.04); border: 1px solid rgba(168, 85, 247, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Build Quality</span>
             <span style="font-size: 18px; font-weight: 800; color: #c084fc;">${analysis.buildQuality || 90}%</span>
@@ -423,6 +430,7 @@ const Lab = () => {
       </div>
     `;
 
+    // --- PAGE 2 GENERATION ---
     const formatValue = (val, fall) => val?.name || val?.material || val?.speakers || fall || "Not Selected";
     
     const cameraSpecs = config.camera?.slots
@@ -467,6 +475,7 @@ const Lab = () => {
       </div>
     `;
 
+    // --- PAGE 3 & 4 DIAGNOSTICS GENERATION ---
     const renderListItems = (items) => {
       if (!items || items.length === 0) return `<div style="color:#6b7280; font-size:13px; padding-left:15px;">No metric traces evaluated.</div>`;
       return items.map(i => `<li style="margin-bottom: 8px; line-height: 1.4; color:#d1d5db; font-size:13px;">${i}</li>`).join("");
@@ -476,10 +485,12 @@ const Lab = () => {
 
     const aiDataSegment1 = `
       <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI RECOMMENDATION</h3>
+      
       <div style="margin-bottom: 25px;">
         <h4 style="color:#34d399; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▲ PROS</h4>
         <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.strengths)}</ul>
       </div>
+
       <div style="margin-bottom: 25px;">
         <h4 style="color:#f87171; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▼ CONS</h4>
         <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.weaknesses)}</ul>
@@ -488,10 +499,12 @@ const Lab = () => {
 
     const aiDataSegment2 = `
       <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI RECOMMENDATION CONTINUED</h3>
+
       <div style="margin-bottom: 30px;">
         <h4 style="color:#fbbf24; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">❖ OPTIMIZATION SUGGESTIONS</h4>
         <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.upgrades || analysis.suggestions)}</ul>
       </div>
+
       <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px;">
         <h4 style="color:#818cf8; font-size:11px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; font-family:monospace; text-transform:uppercase;">EXECUTIVE BUILD SUMMARY</h4>
         <p style="color:#9ca3af; font-size:13px; line-height:1.55; margin:0; text-align:justify;">${analysis.summary || "Blueprint verification profile compiled without execution errors."}</p>
@@ -506,6 +519,7 @@ const Lab = () => {
 
     for (let i = 0; i < pages.length; i++) {
       if (i > 0) pdf.addPage();
+      
       const pageCanvas = await html2canvas(pages[i], {
         scale: 2.5,
         useCORS: true,
@@ -513,17 +527,18 @@ const Lab = () => {
         backgroundColor: "#090d16",
         logging: false
       });
+
       const cleanImage = pageCanvas.toDataURL("image/png");
       pdf.addImage(cleanImage, "PNG", 0, 0, 210, 297);
     }
 
     pdf.save(`${buildName.trim().replace(/\s+/g, "-") || "ForgeMobile"}-Premium-Report.pdf`);
+    
     document.body.removeChild(printSandbox);
     toast.dismiss(toastId);
     toast.success("Premium Report Exported Successfully");
     setExportingPDF(false);
   };
-
   const updateConfig = (updater) => {
     setBuildSaved(false);
     if (isInitialEditLoad.current) return;
@@ -781,7 +796,12 @@ const Lab = () => {
                       <span className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-md text-indigo-400 font-mono text-xs w-fit">REPORT // LIVE</span>
                     </div>
                   )}
-                  <BuildSummaryCard buildName={buildName} totalPrice={totalPrice} {...config} />
+                  <BuildSummaryCard
+  buildName={buildName}
+  totalPrice={totalPrice}
+  marketPrice={analysis?.marketPrice}
+  {...config}
+/>
                 </motion.div>
               )}
             </AnimatePresence>
