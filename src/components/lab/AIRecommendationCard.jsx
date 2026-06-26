@@ -40,7 +40,7 @@ const AIRecommendationCard = ({ analysis }) => {
       <div className="mb-8 bg-black/20 border border-gray-800/60 rounded-xl p-5 sm:p-6 transition-all hover:border-emerald-500/20">
         <h3 className="text-emerald-400 text-lg font-bold mb-4 tracking-wide uppercase flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-          Strengths
+          Pros
         </h3>
         <ul className="text-gray-300 space-y-3 leading-relaxed text-sm sm:text-base">
           {(analysis.strengths || []).map((item, index) => (
@@ -60,7 +60,7 @@ const AIRecommendationCard = ({ analysis }) => {
       <div className="mb-8 bg-black/20 border border-gray-800/60 rounded-xl p-5 sm:p-6 transition-all hover:border-red-500/20">
         <h3 className="text-red-400 text-lg font-bold mb-4 tracking-wide uppercase flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-red-400 shadow-[0_0_8px_#f87171]" />
-          Weaknesses
+          Cons
         </h3>
         <ul className="text-gray-300 space-y-3 leading-relaxed text-sm sm:text-base">
           {(analysis.weaknesses || []).map((item, index) => (
@@ -103,7 +103,7 @@ const AIRecommendationCard = ({ analysis }) => {
       >
         <div className="flex items-center gap-2 mb-2">
           <strong className="text-indigo-400 uppercase text-xs font-mono tracking-widest">
-            Summary Data Frame
+            AI Summary
           </strong>
         </div>
         <p className="text-gray-300 leading-relaxed text-sm sm:text-base whitespace-pre-line">
