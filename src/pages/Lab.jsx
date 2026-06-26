@@ -334,7 +334,7 @@ const Lab = () => {
     }
   };
 
-  /* ADVANCED MULTI-PAGE DYNAMIC OVERFLOW PDF EXPORT ENGINE */
+ /* ADVANCED MULTI-PAGE DYNAMIC OVERFLOW PDF EXPORT ENGINE */
   const exportPDF = async () => {
     if (!canExportPDF || !analysis) {
       toast.error("Run Compatibility Test before exporting");
@@ -401,22 +401,30 @@ const Lab = () => {
 
       <div style="margin-top: 45px;">
         <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; font-family: monospace;">CORE PERFORMANCE RATINGS</h3>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+        
+        {/* Updated grid rules from 2-columns to 3-columns layout mapping to seamlessly accommodate 5 metrics */}
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
           <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 14px; color: #d1d5db; font-weight: 500;">Overall Integrity Score</span>
-            <span style="font-size: 20px; font-weight: 800; color: #ffffff;">${analysis.overallScore || 95}%</span>
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Overall Integrity</span>
+            <span style="font-size: 18px; font-weight: 800; color: #ffffff;">${analysis.overallScore || 95}%</span>
           </div>
           <div style="background: rgba(6, 182, 212, 0.04); border: 1px solid rgba(6, 182, 212, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 14px; color: #d1d5db; font-weight: 500;">Processor Performance</span>
-            <span style="font-size: 20px; font-weight: 800; color: #22d3ee;">${analysis.performanceScore || 99}%</span>
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Processor Performance</span>
+            <span style="font-size: 18px; font-weight: 800; color: #22d3ee;">${analysis.performanceScore || 99}%</span>
           </div>
           <div style="background: rgba(52, 211, 153, 0.04); border: 1px solid rgba(52, 211, 153, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 14px; color: #d1d5db; font-weight: 500;">Battery Optimization</span>
-            <span style="font-size: 20px; font-weight: 800; color: #34d399;">${analysis.batteryEfficiency || 99}%</span>
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Battery Optimization</span>
+            <span style="font-size: 18px; font-weight: 800; color: #34d399;">${analysis.batteryEfficiency || 99}%</span>
           </div>
           <div style="background: rgba(249, 115, 22, 0.04); border: 1px solid rgba(249, 115, 22, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 14px; color: #d1d5db; font-weight: 500;">Thermal Management</span>
-            <span style="font-size: 20px; font-weight: 800; color: #fb923c;">${analysis.thermalScore || 88}%</span>
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Thermal Control</span>
+            <span style="font-size: 18px; font-weight: 800; color: #fb923c;">${analysis.thermalScore || 88}%</span>
+          </div>
+          
+          {/* Brand New Build Quality Metric Card Injection Layer */}
+          <div style="background: rgba(168, 85, 247, 0.04); border: 1px solid rgba(168, 85, 247, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; grid-column: span 2;">
+            <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Build Quality Integrity</span>
+            <span style="font-size: 18px; font-weight: 800; color: #c084fc;">${analysis.buildQuality || 90}%</span>
           </div>
         </div>
       </div>
@@ -425,7 +433,6 @@ const Lab = () => {
     // --- PAGE 2 GENERATION ---
     const formatValue = (val, fall) => val?.name || val?.material || val?.speakers || fall || "Not Selected";
     
-    // Formatter logic to change counts into descriptive text strings
     const cameraSpecs = config.camera?.slots
       ?.map((slot) => `${slot.mp}MP ${slot.type}${slot.ois === "Yes" || slot.ois === true ? " (OIS)" : ""}`)
       .join(" + ") || `${config.camera?.count || 0} Cameras Selected`;
@@ -444,17 +451,17 @@ const Lab = () => {
       { name: "Storage Module", val: config.storage ? `${config.storage.capacity}GB ${config.storage.type}` : "Not Selected" },
       { name: "Battery Cell Tank", val: config.battery ? `${config.battery.capacity}mAh (${config.battery.chargingSpeed}W)` : "Not Selected" },
       { name: "Display Panel", val: config.display ? `${config.display.panelType} ${config.display.refreshRate}Hz` : "Not Selected" },
-      { name: "Camera Suite", val: cameraSpecs }, // <-- Fixed from count to data mapping string
+      { name: "Camera Suite", val: cameraSpecs }, 
       { name: "Thermal Subsystem", val: formatValue(config.thermal) },
       { name: "Chassis Material", val: formatValue(config.phoneBuild) },
       { name: "Haptic Actuator", val: formatValue(config.haptics) },
       { name: "Connectivity Suite", val: `${config.connectivity?.network?.type || "5G"} | ${config.connectivity?.wifi?.type || "WiFi"} | ${config.connectivity?.bluetooth?.type || "BT"}` },
       { name: "Audio System", val: formatValue(config.audio) },
-      { name: "Sensors Matrix", val: sensorsSpecs }, // <-- Fixed from count to data mapping string
-      { name: "Expansion Nodes", val: expansionSpecs } // <-- Fixed from count to data mapping string
+      { name: "Sensors Matrix", val: sensorsSpecs }, 
+      { name: "Expansion Nodes", val: expansionSpecs } 
     ].map(r => `
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.03); gap: 20px;">
-        <span style="font-size: 13px; color: #9ca3af; font-weight: 400; shrink-0;">${r.name}</span>
+        <span style="font-size: 13px; color: #9ca3af; font-weight: 400; flex-shrink: 0;">${r.name}</span>
         <span style="font-size: 13px; color: #ffffff; font-weight: 600; text-align: right; max-width: 480px; word-break: break-word;">${r.val}</span>
       </div>
     `).join("");
@@ -532,7 +539,6 @@ const Lab = () => {
     toast.success("Premium Report Exported Successfully");
     setExportingPDF(false);
   };
-
   const updateConfig = (updater) => {
     setBuildSaved(false);
     if (isInitialEditLoad.current) return;
