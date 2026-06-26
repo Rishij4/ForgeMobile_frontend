@@ -334,6 +334,7 @@ const Lab = () => {
     }
   };
 
+  /* ADVANCED MULTI-PAGE DYNAMIC OVERFLOW PDF EXPORT ENGINE */
   const exportPDF = async () => {
     if (!canExportPDF || !analysis) {
       toast.error("Run Compatibility Test before exporting");
@@ -341,39 +342,44 @@ const Lab = () => {
     }
 
     setExportingPDF(true);
-    const id = toast.loading("Forging high-fidelity PDF document framework...");
+    const toastId = toast.loading("Forging high-fidelity PDF document framework...");
 
+    // Create a sandbox element isolated safely offscreen
     const printSandbox = document.createElement("div");
     printSandbox.style.position = "absolute";
     printSandbox.style.left = "-9999px";
     printSandbox.style.top = "-9999px";
-    printSandbox.style.width = "794px";
+    printSandbox.style.width = "794px"; 
     printSandbox.style.background = "#090d16";
     printSandbox.style.color = "#ffffff";
     printSandbox.style.fontFamily = "system-ui, -apple-system, sans-serif";
     document.body.appendChild(printSandbox);
 
-    const createPdfPage = (contentHtml) => `
-      <div style="width: 794px; height: 1123px; padding: 50px; box-sizing: border-box; background: #090d16; position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;">
+    // Global layout structural builder string helper
+    const buildWrapperHTML = (contentHtml) => `
+      <div class="pdf-page" style="width: 794px; height: 1123px; padding: 50px; box-sizing: border-box; background: #090d16; position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; margin-bottom: 0;">
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(to right, #6366f1, #a855f7, #06b6d4);"></div>
-        <div style="width: 100%;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(99, 102, 241, 0.15); padding-bottom: 15px; margin-bottom: 30px;">
+        <div style="width: 100%; flex-grow: 1; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(99, 102, 241, 0.15); padding-bottom: 15px; margin-bottom: 30px; flex-shrink: 0;">
             <div>
               <span style="font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #ffffff;">FORGE<span style="color: #6366f1;">MOBILE</span></span>
               <div style="font-size: 10px; color: #9ca3af; margin-top: 2px; letter-spacing: 0.5px;">AI-Powered Smartphone Diagnostics</div>
             </div>
             <div style="text-align: right; font-size: 10px; color: #6366f1; font-family: monospace; font-weight: bold; letter-spacing: 1px;">CERTIFIED HARDWARE BLUEPRINT</div>
           </div>
-          ${contentHtml}
+          <div style="width: 100%; flex-grow: 1;">
+            ${contentHtml}
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; font-size: 10px; color: #4b5563;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; font-size: 10px; color: #4b5563; flex-shrink: 0;">
           <div>Generated: ${new Date().toLocaleDateString("en-GB")}</div>
           <div style="font-weight: bold; color: #6366f1; font-family: monospace;">SYSTEM BLUEPRINT PROFILE // ID: ${Math.random().toString(16).substr(2, 8).toUpperCase()}</div>
         </div>
       </div>
     `;
 
-    const page1Html = createPdfPage(`
+    // --- PAGE 1 GENERATION ---
+    const page1Content = `
       <div style="margin-top: 20px;">
         <div style="text-transform: uppercase; font-size: 11px; font-weight: 800; color: #818cf8; letter-spacing: 2px; font-family: monospace;">ADVANCED DIAGNOSTIC REPORT</div>
         <h1 style="font-size: 38px; font-weight: 900; color: #ffffff; margin: 10px 0 5px 0; tracking: -0.5px;">Build: ${buildName || "Rishi"}</h1>
@@ -414,11 +420,23 @@ const Lab = () => {
           </div>
         </div>
       </div>
-    `);
+    `;
 
+    // --- PAGE 2 GENERATION ---
     const formatValue = (val, fall) => val?.name || val?.material || val?.speakers || fall || "Not Selected";
-    const sensorsCount = config.sensors?.length || 0;
-    const extrasCount = config.components?.length || 0;
+    
+    // Formatter logic to change counts into descriptive text strings
+    const cameraSpecs = config.camera?.slots
+      ?.map((slot) => `${slot.mp}MP ${slot.type}${slot.ois === "Yes" || slot.ois === true ? " (OIS)" : ""}`)
+      .join(" + ") || `${config.camera?.count || 0} Cameras Selected`;
+
+    const sensorsSpecs = config.sensors && config.sensors.length > 0
+      ? config.sensors.map(s => s.name).join(", ")
+      : "None Selected";
+
+    const expansionSpecs = config.components && config.components.length > 0
+      ? config.components.map(c => c.name).join(", ")
+      : "None Selected";
 
     const specsRows = [
       { name: "Processor", val: formatValue(config.processor) },
@@ -426,62 +444,68 @@ const Lab = () => {
       { name: "Storage Module", val: config.storage ? `${config.storage.capacity}GB ${config.storage.type}` : "Not Selected" },
       { name: "Battery Cell Tank", val: config.battery ? `${config.battery.capacity}mAh (${config.battery.chargingSpeed}W)` : "Not Selected" },
       { name: "Display Panel", val: config.display ? `${config.display.panelType} ${config.display.refreshRate}Hz` : "Not Selected" },
-      { name: "Camera Suite", val: config.camera ? `${config.camera.count} Active Lens Arrays` : "Not Selected" },
+      { name: "Camera Suite", val: cameraSpecs }, // <-- Fixed from count to data mapping string
       { name: "Thermal Subsystem", val: formatValue(config.thermal) },
       { name: "Chassis Material", val: formatValue(config.phoneBuild) },
       { name: "Haptic Actuator", val: formatValue(config.haptics) },
       { name: "Connectivity Suite", val: `${config.connectivity?.network?.type || "5G"} | ${config.connectivity?.wifi?.type || "WiFi"} | ${config.connectivity?.bluetooth?.type || "BT"}` },
       { name: "Audio System", val: formatValue(config.audio) },
-      { name: "Sensors Matrix", val: `${sensorsCount} Connected Modules` },
-      { name: "Expansion Nodes", val: `${extrasCount} Custom Extras Added` }
+      { name: "Sensors Matrix", val: sensorsSpecs }, // <-- Fixed from count to data mapping string
+      { name: "Expansion Nodes", val: expansionSpecs } // <-- Fixed from count to data mapping string
     ].map(r => `
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
-        <span style="font-size: 13px; color: #9ca3af; font-weight: 400;">${r.name}</span>
-        <span style="font-size: 13px; color: #ffffff; font-weight: 600; text-align: right; max-width: 400px;">${r.val}</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.03); gap: 20px;">
+        <span style="font-size: 13px; color: #9ca3af; font-weight: 400; shrink-0;">${r.name}</span>
+        <span style="font-size: 13px; color: #ffffff; font-weight: 600; text-align: right; max-width: 480px; word-break: break-word;">${r.val}</span>
       </div>
     `).join("");
 
-    const page2Html = createPdfPage(`
+    const page2Content = `
       <div>
         <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">HARDWARE SPECIFICATION MANIFEST</h3>
         <div style="background: rgba(17, 24, 39, 0.4); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; padding: 10px 25px;">
           ${specsRows}
         </div>
       </div>
-    `);
+    `;
 
+    // --- PAGE 3 & 4 DIAGNOSTICS GENERATION ---
     const renderListItems = (items) => {
-      if (!items || items.length === 0) return `<div style="color:#6b7280; font-size:13px;">No metric traces evaluated.</div>`;
-      return items.map(i => `<li style="margin-bottom: 10px; line-height: 1.5; color:#d1d5db; font-size:13px;">${i}</li>`).join("");
+      if (!items || items.length === 0) return `<div style="color:#6b7280; font-size:13px; padding-left:15px;">No metric traces evaluated.</div>`;
+      return items.map(i => `<li style="margin-bottom: 8px; line-height: 1.4; color:#d1d5db; font-size:13px;">${i}</li>`).join("");
     };
 
-    const page3Html = createPdfPage(`
-      <div>
-        <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI DIAGNOSTIC METRIC ANALYSIS</h3>
-        
-        <div style="margin-bottom: 30px;">
-          <h4 style="color:#34d399; font-size:14px; font-weight:bold; margin-bottom:10px;">▲ SYSTEM STRENGTHS</h4>
-          <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.strengths)}</ul>
-        </div>
+    let sandboxPagesHTML = buildWrapperHTML(page1Content) + buildWrapperHTML(page2Content);
 
-        <div style="margin-bottom: 30px;">
-          <h4 style="color:#f87171; font-size:14px; font-weight:bold; margin-bottom:10px;">▼ ARCHITECTURAL WEAKNESSES</h4>
-          <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.weaknesses)}</ul>
-        </div>
-
-        <div style="margin-bottom: 30px;">
-          <h4 style="color:#fbbf24; font-size:14px; font-weight:bold; margin-bottom:10px;">❖ OPTIMIZATION SUGGESTIONS</h4>
-          <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.upgrades || analysis.suggestions)}</ul>
-        </div>
-
-        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 25px;">
-          <h4 style="color:#818cf8; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:10px; font-family:monospace; text-transform:uppercase;">EXECUTIVE EVALUATOR SUMMARY</h4>
-          <p style="color:#9ca3af; font-size:13px; line-height:1.6; margin:0; text-align:justify;">${analysis.summary || "Blueprint verification profile compiled without execution errors."}</p>
-        </div>
+    const aiDataSegment1 = `
+      <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI DIAGNOSTIC METRIC ANALYSIS</h3>
+      
+      <div style="margin-bottom: 25px;">
+        <h4 style="color:#34d399; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▲ SYSTEM STRENGTHS</h4>
+        <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.strengths)}</ul>
       </div>
-    `);
 
-    printSandbox.innerHTML = page1Html + page2Html + page3Html;
+      <div style="margin-bottom: 25px;">
+        <h4 style="color:#f87171; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▼ ARCHITECTURAL WEAKNESSES</h4>
+        <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.weaknesses)}</ul>
+      </div>
+    `;
+
+    const aiDataSegment2 = `
+      <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">SYSTEM PERFORMANCE EVALUATION CONTINUED</h3>
+
+      <div style="margin-bottom: 30px;">
+        <h4 style="color:#fbbf24; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">❖ OPTIMIZATION SUGGESTIONS</h4>
+        <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.upgrades || analysis.suggestions)}</ul>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px;">
+        <h4 style="color:#818cf8; font-size:11px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; font-family:monospace; text-transform:uppercase;">EXECUTIVE EVALUATOR SUMMARY</h4>
+        <p style="color:#9ca3af; font-size:13px; line-height:1.55; margin:0; text-align:justify;">${analysis.summary || "Blueprint verification profile compiled without execution errors."}</p>
+      </div>
+    `;
+
+    sandboxPagesHTML += buildWrapperHTML(aiDataSegment1) + buildWrapperHTML(aiDataSegment2);
+    printSandbox.innerHTML = sandboxPagesHTML;
 
     const pages = printSandbox.children;
     const pdf = new jsPDF("p", "mm", "a4");
@@ -504,7 +528,7 @@ const Lab = () => {
     pdf.save(`${buildName.trim().replace(/\s+/g, "-") || "ForgeMobile"}-Premium-Report.pdf`);
     
     document.body.removeChild(printSandbox);
-    toast.dismiss(id);
+    toast.dismiss(toastId);
     toast.success("Premium Report Exported Successfully");
     setExportingPDF(false);
   };
