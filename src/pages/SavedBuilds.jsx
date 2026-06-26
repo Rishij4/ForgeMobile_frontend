@@ -173,10 +173,10 @@ const SavedBuilds = () => {
                 <div className="bg-gray-950/60 p-4 rounded-xl border border-gray-800/80 text-sm sm:text-base space-y-2">
                   <p className="flex justify-between items-center"><span className="text-indigo-400 font-semibold">Estimated Price:</span><span className="font-bold text-white">₹{selectedBuild.totalPrice}</span></p>
                   {selectedBuild.marketPrice != null && (
-                    <p className="flex justify-between items-center pt-2 border-t border-gray-800/40"><span className="text-indigo-400 font-semibold">AI Market Price:</span><span className="font-bold text-white">₹{selectedBuild.marketPrice.toLocaleString()}</span></p>
+                    <p className="flex justify-between items-center pt-2 border-t border-gray-800/40"><span className="text-indigo-400 font-semibold">Market Price:</span><span className="font-bold text-white">₹{selectedBuild.marketPrice.toLocaleString()}</span></p>
                   )}
                   {selectedBuild.priceDifference !== null && (
-                    <p className="flex justify-between items-center pt-2 border-t border-gray-800/40"><span className="text-indigo-400 font-semibold">Price Delta:</span><span className={`font-bold ${selectedBuild.priceDifference > 0 ? "text-red-400" : "text-green-400"}`}>{selectedBuild.priceDifference > 0 ? `↑ ₹${Math.abs(selectedBuild.priceDifference).toLocaleString()} higher` : `↓ ₹${Math.abs(selectedBuild.priceDifference).toLocaleString()} lower`}</span></p>
+                    <p className="flex justify-between items-center pt-2 border-t border-gray-800/40"><span className="text-indigo-400 font-semibold">Price Difference:</span><span className={`font-bold ${selectedBuild.priceDifference > 0 ? "text-red-400" : "text-green-400"}`}>{selectedBuild.priceDifference > 0 ? `↑ ₹${Math.abs(selectedBuild.priceDifference).toLocaleString()} higher` : `↓ ₹${Math.abs(selectedBuild.priceDifference).toLocaleString()} lower`}</span></p>
                   )}
                 </div>
 
@@ -195,7 +195,7 @@ const SavedBuilds = () => {
                 <div className="bg-gray-950/60 p-4 rounded-xl border border-gray-800/80 text-sm space-y-4">
                   <h3 className="font-bold text-indigo-400 uppercase tracking-wider text-xs border-b border-gray-800/60 pb-2">AI Recommendation</h3>
                   {selectedBuild.tested ? (
-                    [["Strengths", "emerald", selectedBuild.aiRecommendation?.strengths], ["Weaknesses", "red", selectedBuild.aiRecommendation?.weaknesses], ["Upgrade Suggestions", "cyan", selectedBuild.aiRecommendation?.upgradeSuggestions]].map(([ttl, col, arr]) => (
+                    [["▲ PROS", "emerald", selectedBuild.aiRecommendation?.strengths], ["▼ CONS", "red", selectedBuild.aiRecommendation?.weaknesses], ["Upgrade Suggestions", "cyan", selectedBuild.aiRecommendation?.upgradeSuggestions]].map(([ttl, col, arr]) => (
                       <div key={ttl} className="space-y-1.5">
                         <h4 className={`text-xs font-bold uppercase tracking-wider text-${col}-400 flex items-center gap-1.5`}><span className={`w-1 h-1 rounded-full bg-${col}-400 shadow-[0_0_6px_currentColor]`} />{ttl}</h4>
                         <ul className="text-gray-300 space-y-1 pl-4 list-disc text-xs leading-relaxed">{arr?.map((item, idx) => <li key={idx}>{item}</li>)}</ul>
