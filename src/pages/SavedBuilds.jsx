@@ -238,44 +238,44 @@ const SavedBuilds = () => {
           )}
         </AnimatePresence>
 
-        {/* COMPETITOR MODAL - Refactored into a full-viewport responsive engine scroll view */}
+        {/* COMPETITOR MODAL — Double scroll issue resolved cleanly */}
         <AnimatePresence>
           {competitorBuild && (
             <Modal
               isOpen={!!competitorBuild}
               onClose={() => setCompetitorBuild(null)}
             >
-              <div className="space-y-4 max-h-[85vh] overflow-y-auto pr-1 custom-scrollbar w-full max-w-5xl mx-auto">
-                <div className="bg-[#111827] p-5 rounded-2xl border border-cyan-600/40 sticky top-0 z-10 shadow-xl backdrop-blur-md">
+              {/* Outer viewport wrapper with unified scroll handling */}
+              <div className="space-y-5 max-h-[82vh] overflow-y-auto pr-2 custom-scrollbar w-full max-w-5xl mx-auto">
+                <div className="bg-[#111827] p-5 rounded-2xl border border-cyan-600/40 sticky top-0 z-20 shadow-xl backdrop-blur-md">
                   <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                    {competitorBuild.buildName}
+                    {competitorBuild.buildName || "Untitled Build"}
                   </h2>
                   <p className="text-gray-400 mt-1 text-xs sm:text-sm">
                     Market Competitor Analysis Matrix
                   </p>
-                  <div className="mt-3 text-xs sm:text-sm text-gray-300 font-medium">
-                    Your Total Build Est:{" "}
-                    <span className="text-emerald-400 font-bold mr-4">
-                      ₹{competitorBuild.totalPrice?.toLocaleString()}
+                  <div className="mt-3 text-xs sm:text-sm text-gray-300 font-medium flex flex-wrap gap-y-1">
+                    <span className="mr-4">
+                      Your Build Est: <span className="text-emerald-400 font-bold">₹{competitorBuild.totalPrice?.toLocaleString()}</span>
                     </span>
-                    Market Placement Price:{" "}
-                    <span className="text-cyan-400 font-bold">
-                      ₹{competitorBuild.marketPrice?.toLocaleString() || "N/A"}
+                    <span>
+                      Market Placement Price: <span className="text-cyan-400 font-bold">₹{competitorBuild.marketPrice?.toLocaleString() || "N/A"}</span>
                     </span>
                   </div>
                 </div>
 
-                <div className="w-full overflow-x-hidden">
+                {/* Component block with modular borders stripped out */}
+                <div className="w-full px-0.5">
                   <MarketCompetitorCard
                     phones={competitorBuild.competitorPhones || []}
                     userConfig={competitorBuild.selectedComponents}
+                    isModalView={true} 
                   />
                 </div>
               </div>
             </Modal>
           )}
         </AnimatePresence>
-
         {/* DELETE CONFIRMATION MODAL */}
         <AnimatePresence>
           {showDeleteModal && (
