@@ -77,48 +77,95 @@ const MarketCompetitorCard = ({ phones, userConfig, isModalView = false }) => {
     return match ? parseInt(match[0]) : null;
   };
 
-  // Compare values
-  const compareValues = (key, userValue, competitorValue) => {
-    if (key === "ram" || key === "storage" || key === "battery") {
-      const userNum = extractNumber(userValue);
-      const compNum = extractNumber(competitorValue);
+  // Optimized value comparison engine
+const compareValues = (key, userValue, competitorValue) => {
+  const REGEX_DIGIT = /\d+/;
 
-      if (!userNum || !compNum) {
-        return { userClass: "text-white", compClass: "text-white" };
-      }
-
-      if (userNum === compNum) {
-        return {
-          userClass: "text-emerald-400 font-semibold",
-          compClass: "text-emerald-400 font-semibold",
-        };
-      }
-
-      if (userNum > compNum) {
-        return {
-          userClass: "text-emerald-400 font-semibold",
-          compClass: "text-white",
-        };
-      }
-
-      return {
-        userClass: "text-white",
-        compClass: "text-emerald-400 font-semibold",
-      };
-    }
-
-    const u = userValue?.toString().toLowerCase() || "";
-    const c = competitorValue?.toString().toLowerCase() || "";
-
-    if (u.includes(c) || c.includes(u)) {
-      return {
-        userClass: "text-emerald-400 font-semibold",
-        compClass: "text-emerald-400 font-semibold",
-      };
-    }
-
-    return { userClass: "text-white", compClass: "text-white" };
+  const getNumber = (val) => {
+    if (!val) return 0;
+    const match = val.toString().match(REGEX_DIGIT);
+    return match ? parseInt(match[0], 10) : 0;
   };
+
+  const scoreValue = (key, value) => {
+    if (!value) return 0;
+
+    // Handle array length checks immediately before converting to string text
+    if (key === "sensors" || key === "components") {
+      if (Array.isArray(value)) return value.length;
+    }
+
+    const text = value.toString().toLowerCase();
+
+    switch (key) {
+      // Grouped simple numeric extractions together
+      case "processor":
+      case "ram":
+      case "storage":
+      case "display":
+      case "battery":
+      case "camera":
+        return getNumber(text);
+
+      case "connectivity":
+        if (text.includes("6g")) return 6;
+        if (text.includes("5g")) return 5;
+        if (text.includes("4g")) return 4;
+        return 0;
+
+      case "audio": {
+        let audioScore = 0;
+        if (text.includes("stereo")) audioScore += 2;
+        if (text.includes("dolby")) audioScore += 2;
+        if (text.includes("hi-res")) audioScore += 2;
+        return audioScore;
+      }
+
+      case "thermal":
+        if (text.includes("vapor chamber")) return 5;
+        if (text.includes("liquid cooling")) return 4;
+        if (text.includes("graphite")) return 3;
+        return 1;
+
+      case "phoneBuild":
+        if (text.includes("titanium")) return 5;
+        if (text.includes("aluminum")) return 4;
+        if (text.includes("glass")) return 3;
+        if (text.includes("plastic")) return 2;
+        return 1;
+
+      case "haptics":
+        if (text.includes("x-axis")) return 5;
+        if (text.includes("linear")) return 4;
+        if (text.includes("z-axis")) return 3;
+        return 1;
+
+      case "sensors":
+      case "components":
+        return text.split(",").length;
+
+      default:
+        return 0;
+    }
+  };
+
+  const userScore = scoreValue(key, userValue);
+  const compScore = scoreValue(key, competitorValue);
+
+  // Equal → both white
+  if (userScore === compScore) {
+    return {
+      userClass: "text-white",
+      compClass: "text-white",
+    };
+  }
+
+  // Higher score → emerald green green
+  return {
+    userClass: userScore > compScore ? "text-emerald-400 font-semibold" : "text-white",
+    compClass: compScore > userScore ? "text-emerald-400 font-semibold" : "text-white",
+  };
+};
 
   const rows = [
     ["Processor", "processor"],
