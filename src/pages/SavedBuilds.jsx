@@ -8,6 +8,7 @@ import API from "../services/api";
 import Modal from "../components/common/Modal";
 import Navbar from "../components/layout/Navbar";
 import MarketCompetitorCard from "../components/lab/MarketCompetitorCard";
+
 const SavedBuilds = () => {
   const [builds, setBuilds] = useState([]);
   const [selectedBuild, setSelectedBuild] = useState(null);
@@ -70,6 +71,16 @@ const SavedBuilds = () => {
   const toggleShowMore = (id) => setExpandedBuilds(p => ({ ...p, [id]: !p[id] }));
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05 } } };
   const cardVariants = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } } };
+
+  // Explicit mapping color helper to prevent Tailwind string interpolation failures
+  const getColorClasses = (col) => {
+    const maps = {
+      emerald: { text: "text-emerald-400", bg: "bg-emerald-400" },
+      red: { text: "text-red-400", bg: "bg-red-400" },
+      cyan: { text: "text-cyan-400", bg: "bg-cyan-400" }
+    };
+    return maps[col] || { text: "text-gray-400", bg: "bg-gray-400" };
+  };
 
   if (loading) return (
     <div className="min-h-screen bg-black flex items-center justify-center text-white font-medium text-lg tracking-wide">
@@ -154,19 +165,19 @@ const SavedBuilds = () => {
                   <button onClick={() => { sessionStorage.setItem("compareBuild1", build._id); navigate("/compare"); }} className="bg-purple-600/10 hover:bg-purple-600 border border-purple-500/20 hover:border-purple-500 text-purple-400 hover:text-white transition-all rounded-xl py-2.5">Compare</button>
                   <button onClick={() => { sessionStorage.setItem("loadedBuild", JSON.stringify(build)); toast.success("Build loaded successfully"); navigate("/lab"); }} className="bg-emerald-600 hover:bg-emerald-500 text-white transition-all rounded-xl py-2.5 shadow-md shadow-emerald-600/10">Load Build</button>
                   <button onClick={() => { sessionStorage.setItem("editBuild", JSON.stringify(build)); toast.success("Build ready to edit"); navigate("/lab"); }} className="bg-yellow-500 hover:bg-yellow-400 text-black transition-all rounded-xl py-2.5 shadow-md shadow-yellow-500/10">Edit Build</button>
-                  <button onClick={() => setCompetitorBuild(build)} className="w-full mt-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl py-2.5 text-xs font-semibold transition-all">View Competitors</button>
+                  <button onClick={() => setCompetitorBuild(build)} className="col-span-2 mt-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl py-2.5 text-xs font-semibold transition-all">View Competitors</button>
                 </div>
               </motion.div>
             ))}
           </motion.div>
         )}
 
-        {/* DETAILS MODAL */}
+        {/* DETAILS MODAL - Maximum height parameters added */}
         <AnimatePresence>
           {selectedBuild && (
             <Modal isOpen={!!selectedBuild} onClose={() => setSelectedBuild(null)}>
-              <div className="text-gray-200 space-y-4 pr-1">
-                <div className="bg-[#111827] p-5 rounded-2xl border border-indigo-600/40 shadow-lg relative overflow-hidden">
+              <div className="text-gray-200 space-y-4 max-h-[85vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="bg-[#111827] p-5 rounded-2xl border border-indigo-600/40 shadow-lg relative overflow-hidden sticky top-0 z-10">
                   <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
                   <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">{selectedBuild.buildName}</h2>
                   <p className="text-gray-400 mt-1 text-xs sm:text-sm">Detailed smartphone build analysis report</p>
@@ -197,12 +208,20 @@ const SavedBuilds = () => {
                 <div className="bg-gray-950/60 p-4 rounded-xl border border-gray-800/80 text-sm space-y-4">
                   <h3 className="font-bold text-indigo-400 uppercase tracking-wider text-xs border-b border-gray-800/60 pb-2">AI Recommendation</h3>
                   {selectedBuild.tested ? (
-                    [["▲ PROS", "emerald", selectedBuild.aiRecommendation?.strengths], ["▼ CONS", "red", selectedBuild.aiRecommendation?.weaknesses], ["Upgrade Suggestions", "cyan", selectedBuild.aiRecommendation?.upgradeSuggestions]].map(([ttl, col, arr]) => (
-                      <div key={ttl} className="space-y-1.5">
-                        <h4 className={`text-xs font-bold uppercase tracking-wider text-${col}-400 flex items-center gap-1.5`}><span className={`w-1 h-1 rounded-full bg-${col}-400 shadow-[0_0_6px_currentColor]`} />{ttl}</h4>
-                        <ul className="text-gray-300 space-y-1 pl-4 list-disc text-xs leading-relaxed">{arr?.map((item, idx) => <li key={idx}>{item}</li>)}</ul>
-                      </div>
-                    ))
+                    [["▲ PROS", "emerald", selectedBuild.aiRecommendation?.strengths], ["▼ CONS", "red", selectedBuild.aiRecommendation?.weaknesses], ["Upgrade Suggestions", "cyan", selectedBuild.aiRecommendation?.upgradeSuggestions]].map(([ttl, col, arr]) => {
+                      const colors = getColorClasses(col);
+                      return (
+                        <div key={ttl} className="space-y-1.5">
+                          <h4 className={`text-xs font-bold uppercase tracking-wider ${colors.text} flex items-center gap-1.5`}>
+                            <span className={`w-1 h-1 rounded-full ${colors.bg}`} />
+                            {ttl}
+                          </h4>
+                          <ul className="text-gray-300 space-y-1 pl-4 list-disc text-xs leading-relaxed">
+                            {arr && arr.length > 0 ? arr.map((item, idx) => <li key={idx}>{item}</li>) : <li className="text-gray-500 list-none pl-0 italic">None analyzed</li>}
+                          </ul>
+                        </div>
+                      );
+                    })
                   ) : <div className="py-2"><p className="text-yellow-400 text-sm font-medium">No AI analysis available</p><p className="text-gray-500 text-xs mt-2">Run compatibility test to unlock AI-powered recommendations.</p></div>}
                 </div>
 
@@ -219,41 +238,43 @@ const SavedBuilds = () => {
           )}
         </AnimatePresence>
 
+        {/* COMPETITOR MODAL - Refactored into a full-viewport responsive engine scroll view */}
         <AnimatePresence>
-  {competitorBuild && (
-    <Modal
-      isOpen={!!competitorBuild}
-      onClose={() => setCompetitorBuild(null)}
-    >
-      <div className="space-y-4">
+          {competitorBuild && (
+            <Modal
+              isOpen={!!competitorBuild}
+              onClose={() => setCompetitorBuild(null)}
+            >
+              <div className="space-y-4 max-h-[85vh] overflow-y-auto pr-1 custom-scrollbar w-full max-w-5xl mx-auto">
+                <div className="bg-[#111827] p-5 rounded-2xl border border-cyan-600/40 sticky top-0 z-10 shadow-xl backdrop-blur-md">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    {competitorBuild.buildName}
+                  </h2>
+                  <p className="text-gray-400 mt-1 text-xs sm:text-sm">
+                    Market Competitor Analysis Matrix
+                  </p>
+                  <div className="mt-3 text-xs sm:text-sm text-gray-300 font-medium">
+                    Your Total Build Est:{" "}
+                    <span className="text-emerald-400 font-bold mr-4">
+                      ₹{competitorBuild.totalPrice?.toLocaleString()}
+                    </span>
+                    Market Placement Price:{" "}
+                    <span className="text-cyan-400 font-bold">
+                      ₹{competitorBuild.marketPrice?.toLocaleString() || "N/A"}
+                    </span>
+                  </div>
+                </div>
 
-        <div className="bg-[#111827] p-5 rounded-2xl border border-cyan-600/40">
-          <h2 className="text-2xl font-bold text-white">
-            {competitorBuild.buildName}
-          </h2>
-
-          <p className="text-gray-400 mt-1 text-sm">
-            Market Competitor Analysis
-          </p>
-
-          <div className="mt-3 text-sm text-gray-300">
-            Market Price:{" "}
-            <span className="text-cyan-400 font-bold">
-              ₹{competitorBuild.marketPrice?.toLocaleString()}
-            </span>
-          </div>
-        </div>
-
-        {/* SAME COMPONENT AS LAB PAGE */}
-        <MarketCompetitorCard
-          phones={competitorBuild.competitorPhones || []}
-          userConfig={competitorBuild.selectedComponents}
-        />
-
-      </div>
-    </Modal>
-  )}
-</AnimatePresence>
+                <div className="w-full overflow-x-hidden">
+                  <MarketCompetitorCard
+                    phones={competitorBuild.competitorPhones || []}
+                    userConfig={competitorBuild.selectedComponents}
+                  />
+                </div>
+              </div>
+            </Modal>
+          )}
+        </AnimatePresence>
 
         {/* DELETE CONFIRMATION MODAL */}
         <AnimatePresence>
