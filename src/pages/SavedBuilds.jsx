@@ -148,8 +148,17 @@ const SavedBuilds = () => {
                         <>
                           <ul className="text-xs text-gray-400 space-y-1.5 font-medium pr-1">
                             {visible.map(([key, value]) => (
-                              <li key={key} className="flex gap-1 items-start leading-relaxed"><span className="text-indigo-400 select-none mt-0.5">•</span><span className="text-gray-300 capitalize shrink-0">{key}:</span><span className="text-gray-400 flex-1 break-words">{getComponentName(key, value)}</span></li>
-                            ))}
+  <li key={key} className="grid grid-cols-[auto_1fr] gap-x-2 items-start leading-relaxed min-w-0">
+    <span className="text-gray-300 capitalize font-medium shrink-0">
+      <span className="text-indigo-400 select-none mr-1">•</span>{key}:
+    </span>
+    {/* break-all forces long, unbroken string blobs to wrap safely to the next line */}
+    <span className="text-gray-400 break-all whitespace-normal">
+      {getComponentName(key, value)}
+    </span>
+  </li>
+))}
+
                           </ul>
                           {all.length > 5 && (
                             <button onClick={() => toggleShowMore(build._id)} className="mt-3 text-xs text-cyan-400 hover:text-cyan-300 transition-all">{expandedBuilds[build._id] ? "Show Less" : `Show More (+${all.length - 5})`}</button>
