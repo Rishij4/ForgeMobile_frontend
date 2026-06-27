@@ -35,6 +35,7 @@ import { analyzeBuild } from "../services/aiService";
 import { getPreset } from "../services/presetService";
 import PhonePreview from "../components/preview/PhonePreview";
 import { calculateDependencies } from "../utils/dependencyEngine";
+import MarketCompetitorCard from "../components/lab/MarketCompetitorCard";
 
 const Lab = () => {
   const navigate = useNavigate();
@@ -141,6 +142,7 @@ const Lab = () => {
         summary: editBuild.aiRecommendation?.summary || "",
         upgrades: editBuild.aiRecommendation?.upgradeSuggestions || editBuild.compatibilityResult?.suggestions || [],
         marketPrice: editBuild.marketPrice,
+        competitorPhones: editBuild.competitorPhones || []
       });
       setTestCompleted(true); setCanExportPDF(true); sessionStorage.removeItem("editBuild");
     }
@@ -225,7 +227,7 @@ const Lab = () => {
     try {
       const hasTestData = testCompleted && analysis && analysis.overallScore > 0;
       const buildData = {
-        buildName: buildName.trim() || "Untitled Build", totalPrice, marketPrice: analysis?.marketPrice || null, priceDifference: priceDifference, marketPriceDate: analysis?.marketPrice ? new Date() : null,
+        buildName: buildName.trim() || "Untitled Build", totalPrice, marketPrice: analysis?.marketPrice || null, competitorPhones: analysis?.competitorPhones || [],priceDifference: priceDifference, marketPriceDate: analysis?.marketPrice ? new Date() : null,
         performanceScore: hasTestData ? result?.performanceScore || 0 : null, tested: hasTestData,
         compatibilityResult: hasTestData ? { score: analysis?.overallScore || 0, status: analysis?.compatible ? "Compatible" : "Not Compatible", performanceScore: analysis?.performanceScore || 0, thermalScore: analysis?.thermalScore || 0, buildQuality: analysis.buildQuality || 0, batteryEfficiency: analysis?.batteryEfficiency || 0, issues: analysis?.issues || [], suggestions: analysis?.upgrades || [] } : null,
         aiRecommendation: hasTestData ? { strengths: analysis?.strengths || [], weaknesses: analysis?.weaknesses || [], upgradeSuggestions: analysis?.upgrades || [], summary: analysis?.summary || "" } : null,
@@ -242,7 +244,7 @@ const Lab = () => {
       }
       setBuildSaved(true); setComponentsModified(false); setBuildNameModified(false); sessionStorage.removeItem("labInProgress"); sessionStorage.removeItem("editingBuild");
     } catch (error) {
-      console.log(error); toast.error("Failed to save build");
+      toast.error("Failed to save build");
     }
   };
 
@@ -324,7 +326,7 @@ const Lab = () => {
         !navigator.onLine ? "No internet connection" : err.response?.status ? errorsMap[err.response.status] || "AI analysis failed" : err.code === "ECONNABORTED" ? "AI request timed out" : "AI analysis failed"
       );
       setAiError(true);
-    } finally { // <-- Fixed typo here from mdFinal to finally
+    } finally {
       clearInterval(progressInterval);
       toast.dismiss(loadingToast);
       setTimeout(() => {
@@ -334,7 +336,6 @@ const Lab = () => {
     }
   };
 
- /* ADVANCED MULTI-PAGE DYNAMIC OVERFLOW PDF EXPORT ENGINE */
   const exportPDF = async () => {
     if (!canExportPDF || !analysis) {
       toast.error("Run Compatibility Test before exporting");
@@ -344,7 +345,6 @@ const Lab = () => {
     setExportingPDF(true);
     const toastId = toast.loading("Forging high-fidelity PDF document framework...");
 
-    // Create a sandbox element isolated safely offscreen
     const printSandbox = document.createElement("div");
     printSandbox.style.position = "absolute";
     printSandbox.style.left = "-9999px";
@@ -355,7 +355,6 @@ const Lab = () => {
     printSandbox.style.fontFamily = "system-ui, -apple-system, sans-serif";
     document.body.appendChild(printSandbox);
 
-    // Global layout structural builder string helper
     const buildWrapperHTML = (contentHtml) => `
       <div class="pdf-page" style="width: 794px; height: 1123px; padding: 50px; box-sizing: border-box; background: #090d16; position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; margin-bottom: 0;">
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(to right, #6366f1, #a855f7, #06b6d4);"></div>
@@ -378,7 +377,6 @@ const Lab = () => {
       </div>
     `;
 
-    // --- PAGE 1 GENERATION ---
     const page1Content = `
       <div style="margin-top: 20px;">
         <div style="text-transform: uppercase; font-size: 11px; font-weight: 800; color: #818cf8; letter-spacing: 2px; font-family: monospace;">DIAGNOSTIC REPORT</div>
@@ -387,7 +385,6 @@ const Lab = () => {
           <span style="font-size: 10px;">Compatible:</span> ${analysis.compatible ? "✅ Yes" : "❌ No"}
         </div>
       </div>
-
       <div style="display: flex; gap: 20px; margin-top: 40px;">
         <div style="flex: 1; background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px;">
           <div style="font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: bold; letter-spacing: 0.5px;">Estimated Price</div>
@@ -398,11 +395,8 @@ const Lab = () => {
           <div style="font-size: 26px; font-weight: 800; color: #ffffff; margin-top: 5px;">₹ ${(analysis.marketPrice || totalPrice * 1.2).toLocaleString()}</div>
         </div>
       </div>
-
       <div style="margin-top: 45px;">
         <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; font-family: monospace;">Compatibility Result</h3>
-        
-        
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
           <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Compatibility Score</span>
@@ -420,8 +414,6 @@ const Lab = () => {
             <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Thermal Score</span>
             <span style="font-size: 18px; font-weight: 800; color: #fb923c;">${analysis.thermalScore || 88}%</span>
           </div>
-          
-          
           <div style="background: rgba(168, 85, 247, 0.04); border: 1px solid rgba(168, 85, 247, 0.15); padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 13px; color: #d1d5db; font-weight: 500;">Build Quality</span>
             <span style="font-size: 18px; font-weight: 800; color: #c084fc;">${analysis.buildQuality || 90}%</span>
@@ -430,20 +422,14 @@ const Lab = () => {
       </div>
     `;
 
-    // --- PAGE 2 GENERATION ---
     const formatValue = (val, fall) => val?.name || val?.material || val?.speakers || fall || "Not Selected";
     
     const cameraSpecs = config.camera?.slots
       ?.map((slot) => `${slot.mp}MP ${slot.type}${slot.ois === "Yes" || slot.ois === true ? " (OIS)" : ""}`)
       .join(" + ") || `${config.camera?.count || 0} Cameras Selected`;
 
-    const sensorsSpecs = config.sensors && config.sensors.length > 0
-      ? config.sensors.map(s => s.name).join(", ")
-      : "None Selected";
-
-    const expansionSpecs = config.components && config.components.length > 0
-      ? config.components.map(c => c.name).join(", ")
-      : "None Selected";
+    const sensorsSpecs = config.sensors && config.sensors.length > 0 ? config.sensors.map(s => s.name).join(", ") : "None Selected";
+    const expansionSpecs = config.components && config.components.length > 0 ? config.components.map(c => c.name).join(", ") : "None Selected";
 
     const specsRows = [
       { name: "Processor", val: formatValue(config.processor) },
@@ -475,7 +461,6 @@ const Lab = () => {
       </div>
     `;
 
-    // --- PAGE 3 & 4 DIAGNOSTICS GENERATION ---
     const renderListItems = (items) => {
       if (!items || items.length === 0) return `<div style="color:#6b7280; font-size:13px; padding-left:15px;">No metric traces evaluated.</div>`;
       return items.map(i => `<li style="margin-bottom: 8px; line-height: 1.4; color:#d1d5db; font-size:13px;">${i}</li>`).join("");
@@ -485,12 +470,10 @@ const Lab = () => {
 
     const aiDataSegment1 = `
       <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI RECOMMENDATION</h3>
-      
       <div style="margin-bottom: 25px;">
         <h4 style="color:#34d399; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▲ PROS</h4>
         <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.strengths)}</ul>
       </div>
-
       <div style="margin-bottom: 25px;">
         <h4 style="color:#f87171; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">▼ CONS</h4>
         <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.weaknesses)}</ul>
@@ -499,12 +482,10 @@ const Lab = () => {
 
     const aiDataSegment2 = `
       <h3 style="font-size: 12px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 25px; font-family: monospace;">AI RECOMMENDATION CONTINUED</h3>
-
       <div style="margin-bottom: 30px;">
         <h4 style="color:#fbbf24; font-size:13px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">❖ OPTIMIZATION SUGGESTIONS</h4>
         <ul style="padding-left: 15px; margin: 0;">${renderListItems(analysis.upgrades || analysis.suggestions)}</ul>
       </div>
-
       <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 25px;">
         <h4 style="color:#818cf8; font-size:11px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; font-family:monospace; text-transform:uppercase;">EXECUTIVE BUILD SUMMARY</h4>
         <p style="color:#9ca3af; font-size:13px; line-height:1.55; margin:0; text-align:justify;">${analysis.summary || "Blueprint verification profile compiled without execution errors."}</p>
@@ -533,12 +514,12 @@ const Lab = () => {
     }
 
     pdf.save(`${buildName.trim().replace(/\s+/g, "-") || "ForgeMobile"}-Premium-Report.pdf`);
-    
     document.body.removeChild(printSandbox);
     toast.dismiss(toastId);
     toast.success("Premium Report Exported Successfully");
     setExportingPDF(false);
   };
+
   const updateConfig = (updater) => {
     setBuildSaved(false);
     if (isInitialEditLoad.current) return;
@@ -677,9 +658,9 @@ const Lab = () => {
             </div>
           </div>
 
-          {/* MAIN WORKSPACE */}
-          <motion.div className={`flex flex-col xl:flex-row gap-6 w-full items-start relative ${showPreview ? "justify-between" : "justify-center"}`}>
-            <motion.div layout className={`transition-all duration-500 ease-in-out w-full ${showPreview ? "xl:w-[40%]" : "xl:w-[72%] xl:mx-auto"}`}>
+          {/* MAIN WORKSPACE - Fluid Layout Engine */}
+          <motion.div className={`flex flex-col lg:flex-row gap-6 w-full items-start relative ${showPreview ? "justify-between" : "justify-center"}`}>
+            <motion.div layout className={`transition-all duration-500 ease-in-out w-full ${showPreview ? "lg:w-[45%] xl:w-[40%]" : "lg:w-[80%] xl:w-[72%] lg:mx-auto"}`}>
               <div className="bg-gray-900 border border-gray-800 p-5 sm:p-8 rounded-3xl shadow-2xl space-y-4 relative w-full h-auto">
                 <div className="space-y-2">
                   {[
@@ -758,15 +739,15 @@ const Lab = () => {
               </div>
             </motion.div>
 
-            {/* RIGHT SIDE - PHONE LIVE PREVIEW */}
+            {/* RIGHT SIDE - PHONE LIVE PREVIEW / SIDEBAR WRAPPER */}
             <AnimatePresence mode="popLayout">
               {showPreview && (
                 <motion.div
-                  initial={{ opacity: 0, x: 40, scale: 0.96 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 40, scale: 0.96 }}
+                  initial={{ opacity: 0, lg: x: 40, y: 20, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, lg: x: 40, y: 20, scale: 0.96 }}
                   transition={{ type: "spring", stiffness: 260, damping: 26 }}
-                  className="w-full xl:w-[59%] xl:max-w-[59%] order-first xl:order-none xl:sticky xl:top-[210px] h-fit z-10" 
+                  className="w-full lg:w-[52%] xl:w-[57%] order-first lg:order-none lg:sticky lg:top-[110px] h-fit z-10" 
                 >
                   <div className="w-full backdrop-blur-md rounded-3xl overflow-hidden">
                     <PhonePreview
@@ -782,8 +763,8 @@ const Lab = () => {
             </AnimatePresence>
           </motion.div>
 
-          {/* DIAGNOSTIC OUTPUT SECTIONS */}
-          <div ref={reportRef} className={`mt-8 space-y-8 transition-all duration-500 ${showPreview ? "w-full" : "xl:w-[72%] xl:mx-auto"}`}>
+          {/* DIAGNOSTIC OUTPUT SECTIONS - Standard Width Profiles */}
+          <div ref={reportRef} className={`mt-8 space-y-8 transition-all duration-500 w-full ${showPreview ? "w-full" : "lg:w-[80%] xl:w-[72%] lg:mx-auto"}`}>
             <AnimatePresence mode="wait">
               {(hasSelectedComponents || aiLoading || analysis) && (
                 <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6">
@@ -797,11 +778,11 @@ const Lab = () => {
                     </div>
                   )}
                   <BuildSummaryCard
-  buildName={buildName}
-  totalPrice={totalPrice}
-  marketPrice={analysis?.marketPrice}
-  {...config}
-/>
+                    buildName={buildName}
+                    totalPrice={totalPrice}
+                    marketPrice={analysis?.marketPrice}
+                    {...config}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -843,7 +824,19 @@ const Lab = () => {
                   <BatteryChart score={analysis.batteryEfficiency} />
                   <ThermalChart score={analysis.thermalScore} />
                 </div>
-                <div className="animate-fadeIn"><AIRecommendationCard analysis={analysis} /></div>
+
+                <div className="animate-fadeIn">
+                  <AIRecommendationCard analysis={analysis} />
+                </div>
+
+                {analysis?.competitorPhones?.length > 0 && (
+                  <div className="animate-fadeIn">
+                    <MarketCompetitorCard
+                      phones={analysis.competitorPhones}
+                      userConfig={config}
+                    />
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -936,6 +929,7 @@ const Lab = () => {
                       ForgeMobile Live Preview is currently under active development.
                       <br /><br />
                       Mobile devices are not fully supported yet.
+                      <br /><br />
                       If you still want to preview it open ForgeMobile in Desktop.
                     </>
                   ) : (
