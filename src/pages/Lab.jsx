@@ -741,14 +741,14 @@ const Lab = () => {
 
             {/* RIGHT SIDE - PHONE LIVE PREVIEW / SIDEBAR WRAPPER */}
             <AnimatePresence mode="popLayout">
-              {showPreview && (
-                <motion.div
-                  initial={{ opacity: 0, lg: x: 40, y: 20, scale: 0.96 }}
-                  animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, lg: x: 40, y: 20, scale: 0.96 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 26 }}
-                  className="w-full lg:w-[52%] xl:w-[57%] order-first lg:order-none lg:sticky lg:top-[110px] h-fit z-10" 
-                >
+  {showPreview && (
+    <motion.div
+      initial={{ opacity: 0, x: 40, y: 20, scale: 0.96 }}
+      animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 40, y: 20, scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 260, damping: 26 }}
+      className="w-full lg:w-[52%] xl:w-[57%] order-first lg:order-none lg:sticky lg:top-[110px] h-fit z-10"
+    >
                   <div className="w-full backdrop-blur-md rounded-3xl overflow-hidden">
                     <PhonePreview
                       config={config}
