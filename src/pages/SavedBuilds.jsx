@@ -7,10 +7,11 @@ import { FiTrash2, FiShare2 } from "react-icons/fi";
 import API from "../services/api";
 import Modal from "../components/common/Modal";
 import Navbar from "../components/layout/Navbar";
-
+import MarketCompetitorCard from "../components/lab/MarketCompetitorCard";
 const SavedBuilds = () => {
   const [builds, setBuilds] = useState([]);
   const [selectedBuild, setSelectedBuild] = useState(null);
+  const [competitorBuild, setCompetitorBuild] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [buildToDelete, setBuildToDelete] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -153,6 +154,7 @@ const SavedBuilds = () => {
                   <button onClick={() => { sessionStorage.setItem("compareBuild1", build._id); navigate("/compare"); }} className="bg-purple-600/10 hover:bg-purple-600 border border-purple-500/20 hover:border-purple-500 text-purple-400 hover:text-white transition-all rounded-xl py-2.5">Compare</button>
                   <button onClick={() => { sessionStorage.setItem("loadedBuild", JSON.stringify(build)); toast.success("Build loaded successfully"); navigate("/lab"); }} className="bg-emerald-600 hover:bg-emerald-500 text-white transition-all rounded-xl py-2.5 shadow-md shadow-emerald-600/10">Load Build</button>
                   <button onClick={() => { sessionStorage.setItem("editBuild", JSON.stringify(build)); toast.success("Build ready to edit"); navigate("/lab"); }} className="bg-yellow-500 hover:bg-yellow-400 text-black transition-all rounded-xl py-2.5 shadow-md shadow-yellow-500/10">Edit Build</button>
+                  <button onClick={() => setCompetitorBuild(build)} className="w-full mt-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl py-2.5 text-xs font-semibold transition-all">View Competitors</button>
                 </div>
               </motion.div>
             ))}
@@ -216,6 +218,42 @@ const SavedBuilds = () => {
             </Modal>
           )}
         </AnimatePresence>
+
+        <AnimatePresence>
+  {competitorBuild && (
+    <Modal
+      isOpen={!!competitorBuild}
+      onClose={() => setCompetitorBuild(null)}
+    >
+      <div className="space-y-4">
+
+        <div className="bg-[#111827] p-5 rounded-2xl border border-cyan-600/40">
+          <h2 className="text-2xl font-bold text-white">
+            {competitorBuild.buildName}
+          </h2>
+
+          <p className="text-gray-400 mt-1 text-sm">
+            Market Competitor Analysis
+          </p>
+
+          <div className="mt-3 text-sm text-gray-300">
+            Market Price:{" "}
+            <span className="text-cyan-400 font-bold">
+              ₹{competitorBuild.marketPrice?.toLocaleString()}
+            </span>
+          </div>
+        </div>
+
+        {/* SAME COMPONENT AS LAB PAGE */}
+        <MarketCompetitorCard
+          phones={competitorBuild.competitorPhones || []}
+          userConfig={competitorBuild.selectedComponents}
+        />
+
+      </div>
+    </Modal>
+  )}
+</AnimatePresence>
 
         {/* DELETE CONFIRMATION MODAL */}
         <AnimatePresence>
