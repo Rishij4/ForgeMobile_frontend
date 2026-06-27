@@ -215,27 +215,48 @@ const MarketCompetitorCard = ({ phones, userConfig, isModalView = false }) => {
   ];
 
   return (
-    <div className="mt-8 bg-[#111827] border border-indigo-500/20 rounded-2xl p-6 text-white">
-      <h2 className="text-2xl font-bold text-indigo-400 mb-6">Competitor Comparison</h2>
+    <div className="mt-6 bg-[#111827] border border-indigo-500/20 rounded-2xl p-4 sm:p-6 text-white w-full overflow-hidden">
+      <h2 className="text-xl sm:text-2xl font-bold text-indigo-400 mb-6">Competitor Comparison</h2>
       {phones && phones.length > 0 ? (
         phones.map((phone, idx) => (
-          <div key={idx} className="mb-8 border border-gray-700 rounded-xl p-5">
-            <h3 className="text-lg font-bold text-yellow-400 mb-4">{phone.brand} {phone.model} — ₹{phone.price}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 font-semibold border-b border-gray-700 pb-2">
+          <div key={idx} className="mb-6 border border-gray-700 rounded-xl p-4 sm:p-5 bg-black/10">
+            <h3 className="text-base sm:text-lg font-bold text-yellow-400 mb-4">{phone.brand} {phone.model} — ₹{phone.price}</h3>
+            
+            {/* Table Header: Only visible on Medium screens and up */}
+            <div className="hidden md:grid grid-cols-3 gap-4 mb-3 font-semibold border-b border-gray-700 pb-2 text-sm">
               <div className="text-gray-400">Component</div>
               <div className="text-indigo-400">Your Build</div>
               <div className="text-yellow-400">Competitor</div>
             </div>
-            {rows.map(([label, key]) => {
-              const comparison = compareValues(key, userSpecs[key], phone[key]);
-              return (
-                <div key={key} className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 py-2 border-b border-gray-800 text-sm">
-                  <div className="text-gray-400">{label}</div>
-                  <div className={comparison.userClass}>{Array.isArray(userSpecs[key]) ? formatListValue(userSpecs[key]) : userSpecs[key]}</div>
-                  <div className={`${comparison.compClass} break-words`}>{Array.isArray(phone[key]) ? formatListValue(phone[key]) : phone[key] || "Not Available"}</div>
-                </div>
-              );
-            })}
+
+            {/* Spec Comparison Grid Matrix */}
+            <div className="space-y-4 md:space-y-0">
+              {rows.map(([label, key]) => {
+                const comparison = compareValues(key, userSpecs[key], phone[key]);
+                return (
+                  <div key={key} className="md:grid md:grid-cols-3 gap-3 md:gap-4 py-3 md:py-2 border-b border-gray-800/60 text-sm flex flex-col">
+                    
+                    {/* Item label acts as a separator title on mobile devices */}
+                    <div className="text-xs font-bold uppercase tracking-wider text-indigo-500/80 md:text-sm md:normal-case md:tracking-normal md:text-gray-400 md:font-normal">
+                      {label}
+                    </div>
+
+                    {/* Content Columns Wrapper Forced Side-By-Side on mobile */}
+                    <div className="grid grid-cols-2 gap-4 col-span-2 min-w-0 md:contents">
+                      <div className={`${comparison.userClass} break-all md:break-words text-xs sm:text-sm min-w-0`}>
+                        <span className="block md:hidden text-[10px] uppercase text-gray-500 font-mono mb-0.5">Your Build</span>
+                        {Array.isArray(userSpecs[key]) ? formatListValue(userSpecs[key]) : userSpecs[key]}
+                      </div>
+                      <div className={`${comparison.compClass} break-all md:break-words text-xs sm:text-sm min-w-0`}>
+                        <span className="block md:hidden text-[10px] uppercase text-gray-500 font-mono mb-0.5">Competitor</span>
+                        {Array.isArray(phone[key]) ? formatListValue(phone[key]) : phone[key] || "Not Available"}
+                      </div>
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ))
       ) : (
@@ -246,3 +267,4 @@ const MarketCompetitorCard = ({ phones, userConfig, isModalView = false }) => {
 };
 
 export default MarketCompetitorCard;
+        
